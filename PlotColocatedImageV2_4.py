@@ -28,6 +28,7 @@
 #v2.4 28/3/2021
 # Simplified method to search for individual image within 'ImageData'. 
 # Only selects files to plot images where colocation .h5 file already exists
+# Catches error if a stereo image can't be found within 'ImageData'.
 
 
 import numpy as np 
@@ -47,7 +48,6 @@ from Process2DS_v2_5 import GetFlightInfo2DS
 
 def PlotAllImages(Info2DS,FlightNumberStr):  
 
-    #FlightNumberStr = 'C174'
     Path2DSsave = Info2DS[FlightNumberStr,'Path2DSsave']
     tmp = [F for F in os.listdir(Path2DSsave) if F.endswith(".h5") and F.startswith('Colocate_')]
     files = [x.replace('Colocate_', '') for x in tmp]
@@ -82,7 +82,7 @@ def BatchPlotImages_2Channels(Info2DS,FlightNumberStr,filena):
     #ThresholdDiameterYExponent = 1.1
 
     #Nfraction2Plot = 1 # fraction of particles to plot 
-    SizeThreshold  = 0 # min size particle to plot
+    SizeThreshold  = 50 # min size particle to plot
     Nslices = 1600 # Total number of slices per plot
     Npanels =4 # number of panels per plot
     Data_h5 = h5py.File(Path2DSsave + 'Colocate_'+filena, 'r')              
@@ -129,7 +129,7 @@ def BatchPlotImages_2Channels(Info2DS,FlightNumberStr,filena):
                     #Flag images using maxD-minD
                     DeltaDiameterY = np.absolute(ColocationSlicesY_Ch0[x] - ColocationSlicesY_Ch1[x])
                     if ThresholdDeltaDimaterY == -1 :
-                        PairFlag = 1 #No filtereing for DeltaDimaterY
+                        PairFlag = 1 #No filtering for DeltaDimaterY
                     else :
                         PairFlag = np.where(DeltaDiameterY>ThresholdDeltaDimaterY, 0,1)
                     
@@ -172,20 +172,23 @@ def CombineImage2Channels(ImagePath,FileName,ParticleBufferTime_Ch0,ParticleID_C
     
     # Channel 0 
     #Search for particle image
-    #ImageID_Ch0[ImageTimes != ParticleBufferTime_Ch0] = np.nan
-    #i = np.nanargmin((np.absolute(ImageID_Ch0 - ParticleID_Ch0)))
     idx = np.nonzero((ImageTimes == ParticleBufferTime_Ch0) & (ImageID_Ch0 == ParticleID_Ch0))
     i = idx[0]
+    if len(i) != 1:
+        print('Cant find particle =' + str(i))
+        i=i[0]
+        
     ImageCH0 = np.array(Data_h5['ImageData'][:,int(ImagePosition[i]):int(ImagePosition[i+1])]) 
     ImageCH0[ImageCH0 == 0 ] = 1
     ImageCH0[ImageCH0 == 255 ] = 0
     
     # Channel 1
     #Search for particle image
-    #ImageID_Ch1[ImageTimes != ParticleBufferTime_Ch1] = np.nan
-    #i = np.nanargmin((np.absolute(ImageID_Ch1 - ParticleID_Ch1)))
     idx = np.nonzero((ImageTimes == ParticleBufferTime_Ch1) & (ImageID_Ch1 == ParticleID_Ch1))
     i = idx[0]
+    if len(i) != 1:
+        print('Cant find particle =' + str(i))
+        i=i[0]
     ImageCH1 = np.array(Data_h5['ImageData'][:,int(ImagePosition[i]):int(ImagePosition[i+1])]) 
     ImageCH1[ImageCH1 == 0 ] = 2
     ImageCH1[ImageCH1 == 255 ] = 0
