@@ -345,7 +345,7 @@ def GetFlightInfo2DS():
     Info2DS['MAC_218','FlightDate'] = np.datetime64('2015-11-27 00:00:00')
     Info2DS['MAC_218', 'ColocationThreshold'] = 1E-6
     Info2DS['MAC_218', 'IAT_threshold'] =1E-6
-    Info2DS['MAC_218','TAS']=100 #m/s
+    Info2DS['MAC_218','TAS']=60 #m/s
     Info2DS['MAC_218','ThresholdDeltaDiameterY']= 40 # um allowed difference in y diameter for stereo, -1 no threshold
     Info2DS['MAC_218','ThresholdSize'] = 300 # Size to switch between stereo and standard psd
     Info2DS['MAC_218','MeanXYFlag'] = 1 # 1= mean xy, 0= max
@@ -360,16 +360,52 @@ def GetFlightInfo2DS():
     Info2DS['MAC_219','FlightDate'] = np.datetime64('2015-11-27 00:00:00')
     Info2DS['MAC_219', 'ColocationThreshold'] = 1E-6
     Info2DS['MAC_219', 'IAT_threshold'] =1E-6
-    Info2DS['MAC_219','TAS']=100 #m/s
+    Info2DS['MAC_219','TAS']=60 #m/s
     Info2DS['MAC_219','ThresholdDeltaDiameterY']= 40 # um allowed difference in y diameter for stereo, -1 no threshold
     Info2DS['MAC_219','ThresholdSize'] = 300 # Size to switch between stereo and standard psd
     Info2DS['MAC_219','MeanXYFlag'] = 1 # 1= mean xy, 0= max
     Info2DS['MAC_219','BiggestParticle'] = 1 # #BiggestParticle  # 0 = BBox, 1 = largest particle
     Info2DS['MAC_219','FlightNumber'] = '219'
     Info2DS['MAC_219','ArmSep'] = 63
-    #Info2DS['MAC_218','CorePath'] ='D:/PICASSO/rawdata/FAAM_Data/AllCoreFaam/'
-    #Info2DS['MAC_218','CoreFileName'] ='core_faam_20180423_v004_r0_c097_1hz.nc'
+
+    Info2DS['MAC_220','Path2DS']= 'D:/MAC/220/2d-s/OasisOutput/'
+    Info2DS['MAC_220','Path2DSsave']= 'D:/MAC/220/2d-s/OasisOutput/Colocation/'
+    Info2DS['MAC_220','FlightDate'] = np.datetime64('2015-11-28 00:00:00')
+    Info2DS['MAC_220', 'ColocationThreshold'] = 1E-6
+    Info2DS['MAC_220', 'IAT_threshold'] =1E-6
+    Info2DS['MAC_220','TAS']=60 #m/s
+    Info2DS['MAC_220','ThresholdDeltaDiameterY']= 40 # um allowed difference in y diameter for stereo, -1 no threshold
+    Info2DS['MAC_220','ThresholdSize'] = 300 # Size to switch between stereo and standard psd
+    Info2DS['MAC_220','MeanXYFlag'] = 1 # 1= mean xy, 0= max
+    Info2DS['MAC_220','BiggestParticle'] = 1 # #BiggestParticle  # 0 = BBox, 1 = largest particle
+    Info2DS['MAC_220','FlightNumber'] = '220'
+    Info2DS['MAC_220','ArmSep'] = 63
     
+    Info2DS['MAC_221','Path2DS']= 'D:/MAC/221/2d-s/OasisOutput/'
+    Info2DS['MAC_221','Path2DSsave']= 'D:/MAC/221/2d-s/OasisOutput/Colocation/'
+    Info2DS['MAC_221','FlightDate'] = np.datetime64('2015-11-29 00:00:00')
+    Info2DS['MAC_221', 'ColocationThreshold'] = 1E-6
+    Info2DS['MAC_221', 'IAT_threshold'] =1E-6
+    Info2DS['MAC_221','TAS']=60 #m/s
+    Info2DS['MAC_221','ThresholdDeltaDiameterY']= 40 # um allowed difference in y diameter for stereo, -1 no threshold
+    Info2DS['MAC_221','ThresholdSize'] = 300 # Size to switch between stereo and standard psd
+    Info2DS['MAC_221','MeanXYFlag'] = 1 # 1= mean xy, 0= max
+    Info2DS['MAC_221','BiggestParticle'] = 1 # #BiggestParticle  # 0 = BBox, 1 = largest particle
+    Info2DS['MAC_221','FlightNumber'] = '221'
+    Info2DS['MAC_221','ArmSep'] = 63
+    
+    Info2DS['MAC_222','Path2DS']= 'D:/MAC/222/2d-s/OasisOutput/'
+    Info2DS['MAC_222','Path2DSsave']= 'D:/MAC/222/2d-s/OasisOutput/Colocation/'
+    Info2DS['MAC_222','FlightDate'] = np.datetime64('2015-11-30 00:00:00')
+    Info2DS['MAC_222', 'ColocationThreshold'] = 1E-6
+    Info2DS['MAC_222', 'IAT_threshold'] =1E-6
+    Info2DS['MAC_222','TAS']=60 #m/s
+    Info2DS['MAC_222','ThresholdDeltaDiameterY']= 40 # um allowed difference in y diameter for stereo, -1 no threshold
+    Info2DS['MAC_222','ThresholdSize'] = 300 # Size to switch between stereo and standard psd
+    Info2DS['MAC_222','MeanXYFlag'] = 1 # 1= mean xy, 0= max
+    Info2DS['MAC_222','BiggestParticle'] = 1 # #BiggestParticle  # 0 = BBox, 1 = largest particle
+    Info2DS['MAC_222','FlightNumber'] = '222'
+    Info2DS['MAC_222','ArmSep'] = 63
     
     return Info2DS
 
@@ -438,14 +474,14 @@ def FindParticlesOnBothChannelsV2(filena, Info2DS,FlightNumberStr ):
     if len(Channel[Channel == 0 ]) < 20 : return # if less than 100 particles in file don't calculate flag
          
     if BiggestParticle == 0 : # bounding box
-        DiameterX=PixelSize+PixelSize*(ParticleStatsWv[:,4]-ParticleStatsWv[:,3]) #x diameter of largerst paricle in bounding box
+        DiameterX=PixelSize+PixelSize*(ParticleStatsWv[:,4]-ParticleStatsWv[:,3]) #x diameter
         DiameterY = PixelSize+PixelSize*(ParticleStatsWv[:,6]-ParticleStatsWv[:,5])
         MIDx = (ParticleStatsWv[:,4] + ParticleStatsWv[:,3])/2
         #MaxDiameter= np.sqrt(DiameterX**2 + DiameterY**2)
         MaxDiameter=np.where(ParticleStatsWv[:,20] <1, PixelSize,PixelSize*ParticleStatsWv[:,20])
         MeanXYDiameter = (DiameterY+DiameterX) /2 
     if BiggestParticle == 1 :  # largest particle
-        DiameterX=PixelSize+PixelSize*(ParticleStatsWv[:,10]-ParticleStatsWv[:,9]) #x diameter of largerst paricle in bounding box
+        DiameterX=PixelSize+PixelSize*(ParticleStatsWv[:,10]-ParticleStatsWv[:,9]) #x diameter
         DiameterY = PixelSize+PixelSize*(ParticleStatsWv[:,12]-ParticleStatsWv[:,11])
         MIDx = (ParticleStatsWv[:,10] + ParticleStatsWv[:,9])/2
         #MaxDiameter= np.sqrt(DiameterX**2 + DiameterY**2)
@@ -455,8 +491,8 @@ def FindParticlesOnBothChannelsV2(filena, Info2DS,FlightNumberStr ):
     SlicesY = PixelSize+PixelSize*(ParticleStatsWv[:,6]-ParticleStatsWv[:,5]) # Same diameterY when using BBox
     SlicesX = PixelSize+PixelSize*(ParticleStatsWv[:,4]-ParticleStatsWv[:,3]) # Same diameterY when using BBox
     StreakFlag =(np.where(np.logical_and(DiameterX == PixelSize, DiameterY >= Streak*PixelSize), 1, 0))  # 1 = streak, 0 = not 
-    #AspectRatio = DiameterY / DiameterX
-    AspectRatio = SlicesY / SlicesX
+    AspectRatio = DiameterY / DiameterX
+    #AspectRatio = SlicesY / SlicesX
     
     # Edge = 0 not touching array edge
     # Edge = 1 touching array edge
@@ -694,8 +730,6 @@ def FindParticlesOnBothChannelsV2(filena, Info2DS,FlightNumberStr ):
         plt.yscale('log')
         plt.xlim([5,1280])
         plt.ylim([5,1280])
-        #plt.title('IAT = '+str(IAT_threshold)+'s, Colocation = ' + str(ColocationThreshold)+ 's' )
-
         plt.savefig(PathSave+filena[:-3]+'_colocationCH0vsCH1.png',dpi=200)
         plt.close(fig)
         
@@ -764,12 +798,16 @@ def FindParticlesOnBothChannelsV2(filena, Info2DS,FlightNumberStr ):
         
         if len(ColocationSecondsCh1) > 0 and len(ColocationSecondsCh0) > 0 :
             if MeanXYFlag == 1: # mean xy
-                PSD_Colocate_1hzV2(Info2DS,FlightNumberStr,'dNdD_L_',Seconds_Ch0, DiameterX_Ch0, MeanXYDiameter_Ch0, Edge_Ch0, Seconds_Ch1, DiameterX_Ch1, MeanXYDiameter_Ch1, Edge_Ch1,SaveFile,filena,0)
-                PSD_Colocate_1hzV2(Info2DS,FlightNumberStr,'dNdD_L_Colocate_',ColocationSecondsCh0[Idx], ColocationDiameterX_Ch0[Idx], ColocationMeanXYDiameter_Ch0[Idx], ColocationEdgeCh0[Idx], ColocationSecondsCh1[Idx], ColocationDiameterX_Ch1[Idx], ColocationMeanXYDiameter_Ch1[Idx], ColocationEdgeCh1[Idx],SaveFile,filena,1)
+                PSD_Colocate_1hzV2(Info2DS,FlightNumberStr,'dNdD_L_',Seconds_Ch0, DiameterX_Ch0, MeanXYDiameter_Ch0, Edge_Ch0, 
+                                   Seconds_Ch1, DiameterX_Ch1, MeanXYDiameter_Ch1, Edge_Ch1,SaveFile,filena,0)
+                PSD_Colocate_1hzV2(Info2DS,FlightNumberStr,'dNdD_L_Colocate_',ColocationSecondsCh0[Idx], ColocationDiameterX_Ch0[Idx], ColocationMeanXYDiameter_Ch0[Idx], ColocationEdgeCh0[Idx], 
+                                   ColocationSecondsCh1[Idx], ColocationDiameterX_Ch1[Idx], ColocationMeanXYDiameter_Ch1[Idx], ColocationEdgeCh1[Idx],SaveFile,filena,1)
             
             if MeanXYFlag == 0: # max
-                PSD_Colocate_1hzV2(Info2DS,FlightNumberStr,'dNdD_L_',Seconds_Ch0, DiameterX_Ch0, MaxDiameter_Ch0, Edge_Ch0, Seconds_Ch1, DiameterX_Ch1, MaxDiameter_Ch1, Edge_Ch1,SaveFile,filena,0)
-                PSD_Colocate_1hzV2(Info2DS,FlightNumberStr,'dNdD_L_Colocate_',ColocationSecondsCh0[Idx], ColocationDiameterX_Ch0[Idx], ColocationMaxDiameter_Ch0[Idx], ColocationEdgeCh0[Idx], ColocationSecondsCh1[Idx], ColocationDiameterX_Ch1[Idx], ColocationMaxDiameter_Ch1[Idx], ColocationEdgeCh1[Idx],SaveFile,filena,1)
+                PSD_Colocate_1hzV2(Info2DS,FlightNumberStr,'dNdD_L_',Seconds_Ch0, DiameterX_Ch0, MaxDiameter_Ch0, Edge_Ch0, 
+                                   Seconds_Ch1, DiameterX_Ch1, MaxDiameter_Ch1, Edge_Ch1,SaveFile,filena,0)
+                PSD_Colocate_1hzV2(Info2DS,FlightNumberStr,'dNdD_L_Colocate_',ColocationSecondsCh0[Idx], ColocationDiameterX_Ch0[Idx], ColocationMaxDiameter_Ch0[Idx], ColocationEdgeCh0[Idx], 
+                                   ColocationSecondsCh1[Idx], ColocationDiameterX_Ch1[Idx], ColocationMaxDiameter_Ch1[Idx], ColocationEdgeCh1[Idx],SaveFile,filena,1)
                 
 
 
@@ -885,38 +923,32 @@ def PSD_Colocate_1hzV2(Info2DS,FlightNumberStr,SavePrefix,SecondsCh0, DiameterXC
         file.close()
 
 
-    if 1==2 : 
-        #test = datetime.datetime(1,1,1)
-        #dt = [test +datetime.timedelta(seconds = TimeBinsMid[x]) for x in range(len(TimeBinsMid)) ]
-        
-        #test = datetime.datetime(1,1,1)
-        #dt = [test +datetime.timedelta(seconds = TimeBinsMid[x]) for x in range(len(TimeBinsMid)) ]
-        
-        test = np.datetime64('1900-01-01 00:00:00')
-        dt= [test + np.timedelta64(np.int32(x),'s') for x in TimeBinsMid]
+    # if 1==2 : 
+    #     test = np.datetime64('1900-01-01 00:00:00')
+    #     dt= [test + np.timedelta64(np.int32(x),'s') for x in TimeBinsMid]
    
         
         
-        #dt = datetime.timedelta(seconds = TimeBinsMid)
-        fig=plt.figure(figsize=(12,8)) 
-        date_format = mdates.DateFormatter('%H:%M:%S')
-        plt.plot(dt,TotalCounts_Ch0, label = 'Ch0')
-        plt.plot(dt,TotalCounts_Ch1, label = 'Ch1')
-        plt.gca().xaxis.set_major_formatter(date_format)
-        plt.yscale('log')
-        plt.xlabel('Time')
-        plt.ylabel('Total counts')
-        plt.legend()
+    #     #dt = datetime.timedelta(seconds = TimeBinsMid)
+    #     fig=plt.figure(figsize=(12,8)) 
+    #     date_format = mdates.DateFormatter('%H:%M:%S')
+    #     plt.plot(dt,TotalCounts_Ch0, label = 'Ch0')
+    #     plt.plot(dt,TotalCounts_Ch1, label = 'Ch1')
+    #     plt.gca().xaxis.set_major_formatter(date_format)
+    #     plt.yscale('log')
+    #     plt.xlabel('Time')
+    #     plt.ylabel('Total counts')
+    #     plt.legend()
         
-        if ColocatedFlag == 1 :
-            plt.title('Colocated particles')
-            plt.savefig(Path2DSsave+'CountsColocate'+filena[:-3]+'.png',dpi=200)
+    #     if ColocatedFlag == 1 :
+    #         plt.title('Colocated particles')
+    #         plt.savefig(Path2DSsave+'CountsColocate'+filena[:-3]+'.png',dpi=200)
             
-        else : 
-            plt.title('All particles')
-            plt.savefig(Path2DSsave+'Counts'+filena[:-3]+'.png',dpi=200)
+    #     else : 
+    #         plt.title('All particles')
+    #         plt.savefig(Path2DSsave+'Counts'+filena[:-3]+'.png',dpi=200)
             
-        plt.close(fig)
+    #     plt.close(fig)
         
 
 ##________________________________________________________________________________-
@@ -1655,7 +1687,7 @@ def Stereo_Dy_filter(Path2DS,filena,StartTime, EndTime,suffix):
     
 
 #____________________________________________________________________________________
-
+# 2DS sample volume used in OASIS version 1.49962
 
 def OASIS_svol(Diameter,ArmSep, ArrayElements,ProbeRes,TAS ):
     
