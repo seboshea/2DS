@@ -174,25 +174,28 @@ def CombineImage2Channels(ImagePath,FileName,ParticleBufferTime_Ch0,ParticleID_C
     #Search for particle image
     idx = np.nonzero((ImageTimes == ParticleBufferTime_Ch0) & (ImageID_Ch0 == ParticleID_Ch0))
     i = idx[0]
-    if len(i) != 1:
+    if (len(i) != 1) and (ImagePosition[i+1]>ImagePosition[i]) : 
+        ImageCH0 = np.array(Data_h5['ImageData'][:,int(ImagePosition[i]):int(ImagePosition[i+1])]) 
+        ImageCH0[ImageCH0 == 0 ] = 1
+        ImageCH0[ImageCH0 == 255 ] = 0  
+    else : 
         print('Cant find particle =' + str(i))
-        i=i[0]
+        #i=i[0]
+        ImageCH0= np.ones([128,1])*255 #return blank image
         
-    ImageCH0 = np.array(Data_h5['ImageData'][:,int(ImagePosition[i]):int(ImagePosition[i+1])]) 
-    ImageCH0[ImageCH0 == 0 ] = 1
-    ImageCH0[ImageCH0 == 255 ] = 0
-    
     # Channel 1
     #Search for particle image
     idx = np.nonzero((ImageTimes == ParticleBufferTime_Ch1) & (ImageID_Ch1 == ParticleID_Ch1))
     i = idx[0]
-    if len(i) != 1:
+    if (len(i) != 1) and (ImagePosition[i+1]>ImagePosition[i]) : 
+        ImageCH1 = np.array(Data_h5['ImageData'][:,int(ImagePosition[i]):int(ImagePosition[i+1])]) 
+        ImageCH1[ImageCH1 == 0 ] = 2
+        ImageCH1[ImageCH1 == 255 ] = 0
+    else:
         print('Cant find particle =' + str(i))
-        i=i[0]
-    ImageCH1 = np.array(Data_h5['ImageData'][:,int(ImagePosition[i]):int(ImagePosition[i+1])]) 
-    ImageCH1[ImageCH1 == 0 ] = 2
-    ImageCH1[ImageCH1 == 255 ] = 0
-    
+        #i=i[0]
+        ImageCH1= np.ones([128,1])*255 #return blank image
+
     ImageCombine = np.append(ImageCH0, ImageCH1, axis = 1)
 
     if PairFlag == 0 : 
