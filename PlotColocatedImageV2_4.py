@@ -82,7 +82,7 @@ def BatchPlotImages_2Channels(Info2DS,FlightNumberStr,filena):
     #ThresholdDiameterYExponent = 1.1
 
     #Nfraction2Plot = 1 # fraction of particles to plot 
-    SizeThreshold  = 50 # min size particle to plot
+    SizeThreshold  = 0 # min size particle to plot
     Nslices = 1600 # Total number of slices per plot
     Npanels =4 # number of panels per plot
     Data_h5 = h5py.File(Path2DSsave + 'Colocate_'+filena, 'r')              
@@ -174,7 +174,7 @@ def CombineImage2Channels(ImagePath,FileName,ParticleBufferTime_Ch0,ParticleID_C
     #Search for particle image
     idx = np.nonzero((ImageTimes == ParticleBufferTime_Ch0) & (ImageID_Ch0 == ParticleID_Ch0))
     i = idx[0]
-    if (len(i) != 1) and (ImagePosition[i+1]>ImagePosition[i]) : 
+    if (len(i) == 1) and (ImagePosition[i+1]>ImagePosition[i]) : 
         ImageCH0 = np.array(Data_h5['ImageData'][:,int(ImagePosition[i]):int(ImagePosition[i+1])]) 
         ImageCH0[ImageCH0 == 0 ] = 1
         ImageCH0[ImageCH0 == 255 ] = 0  
@@ -187,7 +187,7 @@ def CombineImage2Channels(ImagePath,FileName,ParticleBufferTime_Ch0,ParticleID_C
     #Search for particle image
     idx = np.nonzero((ImageTimes == ParticleBufferTime_Ch1) & (ImageID_Ch1 == ParticleID_Ch1))
     i = idx[0]
-    if (len(i) != 1) and (ImagePosition[i+1]>ImagePosition[i]) : 
+    if (len(i) == 1) and (ImagePosition[i+1]>ImagePosition[i]) : 
         ImageCH1 = np.array(Data_h5['ImageData'][:,int(ImagePosition[i]):int(ImagePosition[i+1])]) 
         ImageCH1[ImageCH1 == 0 ] = 2
         ImageCH1[ImageCH1 == 255 ] = 0
