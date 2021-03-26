@@ -92,29 +92,35 @@ def SaveStereoImagesh5(Info2DS,FlightNumberStr,SizeThreshold):
             #channel 0
             Ch0i = np.nonzero((ImageTimes == ColocationParticleBufferTimeS_Ch0[Idx]) & (ImageID_Ch0 == ColocationImageID_Ch0[Idx]))
             i = Ch0i[0]
-            if (len(i) > 1): 
-                print('Multiple particles with same ID=' + str(i))
-                i=i[0]
-            if (len(i)==0) or (ImagePosition[i+1]-ImagePosition[i] != (ColocationSlicesY_Ch0[Idx]/10) ): 
-                print('Missing or zero slice =' + str(i)) # if can't find particle  
-            else:
-                ImageCH0 = np.array(Data_h5['ImageData'][:,int(ImagePosition[i]):int(ImagePosition[i+1])]) 
-                #Add to output array
-                OutputImageCh0[:,int(OutputImagePositionCh0[j]):int(OutputImagePositionCh0[j+1])] = ImageCH0
+            if (len(i)==0): 
+                print('Missing =' + str(i)) # if can't find particle 
+            else : 
+                if (len(i) > 1): 
+                    print('Multiple particles with same ID=' + str(i)) #repeat particle
+                    i=i[0]
+                if (ImagePosition[i+1]-ImagePosition[i] != (ColocationSlicesY_Ch0[Idx]/10) ): 
+                    print('zero slice =' + str(i)) # 0 slice particle   
+                else:
+                    ImageCH0 = np.array(Data_h5['ImageData'][:,int(ImagePosition[i]):int(ImagePosition[i+1])]) 
+                    #Add to output array
+                    OutputImageCh0[:,int(OutputImagePositionCh0[j]):int(OutputImagePositionCh0[j+1])] = ImageCH0
             
             #Channel 1
             Ch1i = np.nonzero((ImageTimes == ColocationParticleBufferTimeS_Ch1[Idx]) & (ImageID_Ch1 == ColocationImageID_Ch1[Idx]))
             i = Ch1i[0]
-            if (len(i) > 1): 
-                print('Multiple particles with same ID=' + str(i))
-                i=i[0]
-            if (len(i) == 0) or (ImagePosition[i+1]-ImagePosition[i] != (ColocationSlicesY_Ch1[Idx]/10) ):
-                print('Missing or zero slice =' + str(i)) # if can't find particle 
-            else :
-                ImageCH1 = np.array(Data_h5['ImageData'][:,int(ImagePosition[i]):int(ImagePosition[i+1])]) 
-                #Add image to output array
-                OutputImageCh1[:,int(OutputImagePositionCh1[j]):int(OutputImagePositionCh1[j+1])] = ImageCH1
-           
+            if (len(i)==0): 
+                print('Missing =' + str(i)) # if can't find particle 
+            else : 
+                if (len(i) > 1): 
+                    print('Multiple particles with same ID=' + str(i)) #repeat particle
+                    i=i[0]
+                if (ImagePosition[i+1]-ImagePosition[i] != (ColocationSlicesY_Ch1[Idx]/10) ): 
+                    print('zero slice =' + str(i)) # 0 slice particle   
+                else:
+                    ImageCH1 = np.array(Data_h5['ImageData'][:,int(ImagePosition[i]):int(ImagePosition[i+1])]) 
+                    #Add to output array
+                    OutputImageCh1[:,int(OutputImagePositionCh1[j]):int(OutputImagePositionCh1[j+1])] = ImageCH1
+
         Data_h5.close()
         
         # # Save the images as .h5
@@ -133,9 +139,9 @@ def SaveStereoImagesh5(Info2DS,FlightNumberStr,SizeThreshold):
 #
 # create one stereo image file per flight
    
-Flights = ['C174_dataPC', 'C172_dataPC', 'C171_dataPC', 'C170_dataPC', 'C169_dataPC',
-           'C098_dataPC', 'C097_dataPC'] 
-#Flights = ['C172_dataPC'] 
+#Flights = ['C174_dataPC', 'C172_dataPC', 'C171_dataPC', 'C170_dataPC', 'C169_dataPC',
+#           'C098_dataPC', 'C097_dataPC'] 
+Flights = ['C171_dataPC', 'C170_dataPC', 'C169_dataPC', 'C098_dataPC', 'C097_dataPC'] 
 
 for FlightNumberStr in Flights : 
     print(FlightNumberStr)
