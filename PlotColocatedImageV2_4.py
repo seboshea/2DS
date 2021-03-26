@@ -82,7 +82,8 @@ def BatchPlotImages_2Channels(Info2DS,FlightNumberStr,filena):
     #ThresholdDiameterYExponent = 1.1
 
     #Nfraction2Plot = 1 # fraction of particles to plot 
-    SizeThreshold  = 0 # min size particle to plot
+    MinSizeThreshold  = 50 # min size particle to plot
+    MaxSizeThreshold = 2000
     Nslices = 1600 # Total number of slices per plot
     Npanels =4 # number of panels per plot
     Data_h5 = h5py.File(Path2DSsave + 'Colocate_'+filena, 'r')              
@@ -119,7 +120,9 @@ def BatchPlotImages_2Channels(Info2DS,FlightNumberStr,filena):
             while  TotalSize < Nslices and x < len(ColocationImageID_Ch0):
                 #print(x)
                 #if (((ColocationMeanXYDiameter_Ch1[x] > SizeThreshold) or (ColocationMeanXYDiameter_Ch0[x] > SizeThreshold) ) and ColocationEdgeCH0[x] == 0 and ColocationEdgeCH1[x] == 0): 
-                if (((ColocationMeanXYDiameter_Ch1[x] > SizeThreshold) or (ColocationMeanXYDiameter_Ch0[x] > SizeThreshold) ) and (ColocationEdgeCH0[x] == 0 and ColocationEdgeCH1[x] == 0)): 
+                if (((ColocationMeanXYDiameter_Ch1[x] > MinSizeThreshold) or (ColocationMeanXYDiameter_Ch0[x] > MinSizeThreshold)) 
+                    and ((ColocationMeanXYDiameter_Ch1[x] < MaxSizeThreshold) or (ColocationMeanXYDiameter_Ch0[x] > MaxSizeThreshold))
+                    and (ColocationEdgeCH0[x] == 0 and ColocationEdgeCH1[x] == 0)): 
                      
                     # Flag images using maxD > minD**1.1 + 10
                     #MinDiameterY = min(ColocationSlicesY_Ch0[x], ColocationSlicesY_Ch1[x])
@@ -174,27 +177,32 @@ def CombineImage2Channels(ImagePath,FileName,ParticleBufferTime_Ch0,ParticleID_C
     #Search for particle image
     idx = np.nonzero((ImageTimes == ParticleBufferTime_Ch0) & (ImageID_Ch0 == ParticleID_Ch0))
     i = idx[0]
-    if (len(i) == 1) and (ImagePosition[i+1]>ImagePosition[i]) : 
+    
+    if (len(i)==0): 
+        print('Missing =' + str(i)) # if can't find particle 
+        ImageCH0= np.ones([128,1])*255 #return blank image
+    else : 
+        if len(i) > 1:
+            print('Multiple particles with same ID=' + str(i))
+            i=i[0]
         ImageCH0 = np.array(Data_h5['ImageData'][:,int(ImagePosition[i]):int(ImagePosition[i+1])]) 
         ImageCH0[ImageCH0 == 0 ] = 1
         ImageCH0[ImageCH0 == 255 ] = 0  
-    else : 
-        print('Cant find particle =' + str(i))
-        #i=i[0]
-        ImageCH0= np.ones([128,1])*255 #return blank image
-        
+
     # Channel 1
     #Search for particle image
     idx = np.nonzero((ImageTimes == ParticleBufferTime_Ch1) & (ImageID_Ch1 == ParticleID_Ch1))
     i = idx[0]
-    if (len(i) == 1) and (ImagePosition[i+1]>ImagePosition[i]) : 
+    if (len(i)==0): 
+        print('Missing =' + str(i)) # if can't find particle 
+        ImageCH1= np.ones([128,1])*255 #return blank image
+    else : 
+        if len(i) > 1:
+            print('Multiple particles with same ID=' + str(i))
+            i=i[0]
         ImageCH1 = np.array(Data_h5['ImageData'][:,int(ImagePosition[i]):int(ImagePosition[i+1])]) 
         ImageCH1[ImageCH1 == 0 ] = 2
         ImageCH1[ImageCH1 == 255 ] = 0
-    else:
-        print('Cant find particle =' + str(i))
-        #i=i[0]
-        ImageCH1= np.ones([128,1])*255 #return blank image
 
     ImageCombine = np.append(ImageCH0, ImageCH1, axis = 1)
 
