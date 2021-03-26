@@ -33,7 +33,7 @@
 #v2.5 11/2/21
 # Probe settings passed to FindParticlesOnBothChannelsV2() functions via GetFlightInfo2DS()
 # All files saved to Info2DS[FlightNumberStr, 'Path2DSsave']
-# Aspect ratio threshold calculated using bbox aspect ratio (not largest particle)
+# Add thresholds to IAT and colocation time histograms
 
 
 import datetime
@@ -407,6 +407,45 @@ def GetFlightInfo2DS():
     Info2DS['MAC_222','FlightNumber'] = '222'
     Info2DS['MAC_222','ArmSep'] = 63
     
+    Info2DS['MAC_223','Path2DS']= 'D:/MAC/223/2d-s/OasisOut/'
+    Info2DS['MAC_223','Path2DSsave']= 'D:/MAC/223/2d-s/OasisOut/Colocation/'
+    Info2DS['MAC_223','FlightDate'] = np.datetime64('2015-12-03 00:00:00')
+    Info2DS['MAC_223', 'ColocationThreshold'] = 1E-6
+    Info2DS['MAC_223', 'IAT_threshold'] =1E-6
+    Info2DS['MAC_223','TAS']=60 #m/s
+    Info2DS['MAC_223','ThresholdDeltaDiameterY']= 40 # um allowed difference in y diameter for stereo, -1 no threshold
+    Info2DS['MAC_223','ThresholdSize'] = 300 # Size to switch between stereo and standard psd
+    Info2DS['MAC_223','MeanXYFlag'] = 1 # 1= mean xy, 0= max
+    Info2DS['MAC_223','BiggestParticle'] = 1 # #BiggestParticle  # 0 = BBox, 1 = largest particle
+    Info2DS['MAC_223','FlightNumber'] = '223'
+    Info2DS['MAC_223','ArmSep'] = 63
+    
+    Info2DS['MAC_224','Path2DS']= 'D:/MAC/224/2d-s/OasisOut/'
+    Info2DS['MAC_224','Path2DSsave']= 'D:/MAC/224/2d-s/OasisOut/Colocation/'
+    Info2DS['MAC_224','FlightDate'] = np.datetime64('2015-12-06 00:00:00')
+    Info2DS['MAC_224', 'ColocationThreshold'] = 1E-6
+    Info2DS['MAC_224', 'IAT_threshold'] =1E-6
+    Info2DS['MAC_224','TAS']=60 #m/s
+    Info2DS['MAC_224','ThresholdDeltaDiameterY']= 40 # um allowed difference in y diameter for stereo, -1 no threshold
+    Info2DS['MAC_224','ThresholdSize'] = 300 # Size to switch between stereo and standard psd
+    Info2DS['MAC_224','MeanXYFlag'] = 1 # 1= mean xy, 0= max
+    Info2DS['MAC_224','BiggestParticle'] = 1 # #BiggestParticle  # 0 = BBox, 1 = largest particle
+    Info2DS['MAC_224','FlightNumber'] = '224'
+    Info2DS['MAC_224','ArmSep'] = 63
+    
+    Info2DS['MAC_225','Path2DS']= 'D:/MAC/225/2d-s/OasisOut/'
+    Info2DS['MAC_225','Path2DSsave']= 'D:/MAC/225/2d-s/OasisOut/Colocation/'
+    Info2DS['MAC_225','FlightDate'] = np.datetime64('2015-12-07 00:00:00')
+    Info2DS['MAC_225', 'ColocationThreshold'] = 3E-6
+    Info2DS['MAC_225', 'IAT_threshold'] =2E-6
+    Info2DS['MAC_225','TAS']=60 #m/s
+    Info2DS['MAC_225','ThresholdDeltaDiameterY']= 40 # um allowed difference in y diameter for stereo, -1 no threshold
+    Info2DS['MAC_225','ThresholdSize'] = 300 # Size to switch between stereo and standard psd
+    Info2DS['MAC_225','MeanXYFlag'] = 1 # 1= mean xy, 0= max
+    Info2DS['MAC_225','BiggestParticle'] = 1 # #BiggestParticle  # 0 = BBox, 1 = largest particle
+    Info2DS['MAC_225','FlightNumber'] = '225'
+    Info2DS['MAC_225','ArmSep'] = 63
+    
     return Info2DS
 
 
@@ -417,11 +456,12 @@ def GetFlightInfo2DS():
 
 def BatchBothChannels(Info2DS, FlightNumberStr):
     
+    print(FlightNumberStr)
     #FlightNumberStr = 'C172'
     Path2DS = Info2DS[FlightNumberStr, 'Path2DS']
     PathSave = Info2DS[FlightNumberStr, 'Path2DSsave']
     FlightDate = Info2DS[FlightNumberStr,'FlightDate']
-        
+    
     if not os.path.exists(PathSave):
         os.makedirs(PathSave)
     
@@ -575,6 +615,7 @@ def FindParticlesOnBothChannelsV2(filena, Info2DS,FlightNumberStr ):
         plt.plot(HistBinsMid,IAT_Ch0_hist,marker='o', linewidth=0, color = 'r',label='Channel 0')       
         IAT_Ch1_hist, tmp= np.histogram(IAT_Ch1,bins=HistBins)
         plt.plot(HistBinsMid,IAT_Ch1_hist,marker='o', linewidth=0, color = 'c',label='Channel 1')
+        plt.vlines(IAT_threshold, ymin =0 , ymax= np.nanmax(IAT_Ch1_hist),color ='k', linestyle ='--')
         plt.xscale('log')
         plt.yscale('log')
         plt.xlabel('Inter-arrival time, s')
@@ -647,6 +688,7 @@ def FindParticlesOnBothChannelsV2(filena, Info2DS,FlightNumberStr ):
         #ColocationHist[ColocationHist==0] =np.nan
         plt.plot(ColocationBinsMid,ColocationHist,'o')
         #plt.hist(ChTimeDelta,HistBins)
+        plt.vlines(ColocationThreshold, ymin =0 , ymax= np.nanmax(ColocationHist), color ='k', linestyle ='--')
         plt.xscale('symlog', linthreshx=1E-7)
         plt.xlabel('Co-location time, s')
         plt.ylabel('Counts')
