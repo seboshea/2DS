@@ -4,6 +4,10 @@
 # Save stereo images .h5 file
 #v1 17/3/21
 #Original
+#Catches bug if can't find image in ImageData
+#Ignore 0 slice images
+#Error with probe can cause particles to repeat themselves
+#Catches bug when ImageSlices==0
 
 
 import numpy as np 
@@ -34,7 +38,8 @@ def SaveStereoImagesh5(Info2DS,FlightNumberStr,SizeThreshold):
     tmp = [F for F in os.listdir(Path2DSsave) if F.endswith(".h5") and F.startswith('dNdD_L_Colocate_')]
     files = [x.replace('dNdD_L_Colocate_', '') for x in tmp] 
     
-    for filena in files : 
+    for filena in files :
+        print(filena)
         #Load colocation pbp statistics
         Data_h5 = h5py.File(Path2DSsave + 'Colocate_'+filena, 'r')              
         ColocationParticleBufferTimeS_Ch0=np.array(Data_h5['ColocationParticleBufferTimeS_Ch0'])
@@ -84,9 +89,14 @@ def SaveStereoImagesh5(Info2DS,FlightNumberStr,SizeThreshold):
         # Look through select particles and put images in OutputImage
         for j, Idx in enumerate(Stereo_Idxs) : 
             # find each image in array 
+            #channel 0
             Ch0i = np.nonzero((ImageTimes == ColocationParticleBufferTimeS_Ch0[Idx]) & (ImageID_Ch0 == ColocationImageID_Ch0[Idx]))
             i = Ch0i[0]
-            if len(i) != 1: print('Cant find particle =' + str(i)) # if can't find particle  
+            if (len(i) > 1): 
+                print('Multiple particles with same ID=' + str(i))
+                i=i[0]
+            if (len(i)==0) or (ImagePosition[i+1]-ImagePosition[i] != (ColocationSlicesY_Ch0[Idx]/10) ): 
+                print('Missing or zero slice =' + str(i)) # if can't find particle  
             else:
                 ImageCH0 = np.array(Data_h5['ImageData'][:,int(ImagePosition[i]):int(ImagePosition[i+1])]) 
                 #Add to output array
@@ -95,15 +105,19 @@ def SaveStereoImagesh5(Info2DS,FlightNumberStr,SizeThreshold):
             #Channel 1
             Ch1i = np.nonzero((ImageTimes == ColocationParticleBufferTimeS_Ch1[Idx]) & (ImageID_Ch1 == ColocationImageID_Ch1[Idx]))
             i = Ch1i[0]
-            if len(i) != 1: print('Cant find particle =' + str(i)) # if can't find particle 
+            if (len(i) > 1): 
+                print('Multiple particles with same ID=' + str(i))
+                i=i[0]
+            if (len(i) == 0) or (ImagePosition[i+1]-ImagePosition[i] != (ColocationSlicesY_Ch1[Idx]/10) ):
+                print('Missing or zero slice =' + str(i)) # if can't find particle 
             else :
                 ImageCH1 = np.array(Data_h5['ImageData'][:,int(ImagePosition[i]):int(ImagePosition[i+1])]) 
-                #Add to output array
+                #Add image to output array
                 OutputImageCh1[:,int(OutputImagePositionCh1[j]):int(OutputImagePositionCh1[j+1])] = ImageCH1
            
         Data_h5.close()
         
-        # Save the images as .h5
+        # # Save the images as .h5
         h5f = h5py.File(Path2DSsave+'StereoImages_'+filena, 'w')
         h5f.create_dataset('ImageCh0', data=OutputImageCh0)
         h5f.create_dataset('ImagePositionCh0', data=OutputImagePositionCh0)
@@ -118,72 +132,77 @@ def SaveStereoImagesh5(Info2DS,FlightNumberStr,SizeThreshold):
 #__________________________________________________________________________________
 #
 # create one stereo image file per flight
-
-Info2DS = GetFlightInfo2DS()
-FlightNumberStr = 'C172_dataPC'
-SizeThreshold  = 0 # min size particle to save 
-SaveStereoImagesh5(Info2DS,FlightNumberStr,SizeThreshold)
-
-vnumber = 0
-rnumber = 0
-
-Path2DSsave = Info2DS[FlightNumberStr,'Path2DSsave']
-FlightNumber = Info2DS[FlightNumberStr,'FlightNumber'] 
-FlightDate = (Info2DS[FlightNumberStr,'FlightDate']).astype(datetime.datetime)
-
-
-#Combine files
-files = [F for F in os.listdir(Path2DSsave) if F.endswith(".h5") and F.startswith('StereoImages_')]
-for i,F in enumerate(files) : 
-    
-    Data_h5 = h5py.File(Path2DSsave + F, 'r')              
-    tmpImageCh0=np.array(Data_h5['ImageCh0'])
-    tmpImagePositionCh0=np.array(Data_h5['ImagePositionCh0'])
-    tmpSecondsCh0=np.array(Data_h5['SecondsCh0'])
-    tmpSlicesY_Ch0=np.array(Data_h5['SlicesY_Ch0'])
-    tmpImageCh1=np.array(Data_h5['ImageCh1'])
-    tmpImagePositionCh1=np.array(Data_h5['ImagePositionCh1'])
-    tmpSecondsCh1=np.array(Data_h5['SecondsCh1'])
-    tmpSlicesY_Ch1=np.array(Data_h5['SlicesY_Ch1'])
-    Data_h5.close()
-    
-    print(len(tmpSecondsCh1))
-    print(len(tmpImagePositionCh1))
-    
-    if i == 0 : 
-        ImageCh0 = tmpImageCh0
-        ImagePositionCh0= tmpImagePositionCh0
-        SecondsCh0=tmpSecondsCh0
-        SlicesY_Ch0=tmpSlicesY_Ch0
-        ImageCh1=tmpImageCh1
-        ImagePositionCh1=tmpImagePositionCh1
-        SecondsCh1=tmpSecondsCh1
-        SlicesY_Ch1=tmpSlicesY_Ch1
-    else:  
-        ImageCh0= np.append(ImageCh0,tmpImageCh0, axis=1)
-        ImagePositionCh0= np.append(ImagePositionCh0,tmpImagePositionCh0[1:]+ImagePositionCh0[-1], axis=0)
-        SecondsCh0= np.append(SecondsCh0, tmpSecondsCh0, axis=0)
-        SlicesY_Ch0= np.append(SlicesY_Ch0,tmpSlicesY_Ch0, axis=0)
-        ImageCh1= np.append(ImageCh1,tmpImageCh1, axis=1)
-        ImagePositionCh1= np.append(ImagePositionCh1,tmpImagePositionCh1[1:]+ImagePositionCh1[-1], axis=0)
-        SecondsCh1= np.append(SecondsCh1, tmpSecondsCh1, axis=0)
-        SlicesY_Ch1= np.append(SlicesY_Ch1, tmpSlicesY_Ch1, axis=0)
    
+Flights = ['C174_dataPC', 'C172_dataPC', 'C171_dataPC', 'C170_dataPC', 'C169_dataPC',
+           'C098_dataPC', 'C097_dataPC'] 
+#Flights = ['C172_dataPC'] 
 
-# plt.pcolormesh(ImageCh1)
-# plt.vlines(ImagePositionCh1, ymin=0,ymax=128)
-# plt.xlim([2000,2500])
+for FlightNumberStr in Flights : 
+    print(FlightNumberStr)
 
-Mergedfilename='uman-2ds_faam_'+FlightDate.strftime("%Y%m%d")+'_v'+str(vnumber)+'_r'+str(rnumber)+'_'+FlightNumber+'_stereo_images.h5'
-#save to file
-h5f = h5py.File(Path2DSsave+Mergedfilename, 'w')
-h5f.create_dataset('ImageCh0', data=ImageCh0)
-h5f.create_dataset('ImagePositionCh0', data=ImagePositionCh0)
-h5f.create_dataset('SecondsCh0', data=SecondsCh0)
-h5f.create_dataset('ImageWidth_Ch0', data=SlicesY_Ch0)
-h5f.create_dataset('ImageCh1', data=ImageCh1)
-h5f.create_dataset('ImagePositionCh1', data=ImagePositionCh1)
-h5f.create_dataset('SecondsCh1', data=SecondsCh1)
-h5f.create_dataset('ImageWidthCh1', data=SlicesY_Ch1)
-h5f.close()
+    Info2DS = GetFlightInfo2DS()
+    #FlightNumberStr = 'C171_dataPC'
+    SizeThreshold  = 40 # min size particle to save 
+    SaveStereoImagesh5(Info2DS,FlightNumberStr,SizeThreshold)
+    
+    vnumber = 0
+    rnumber = 0
+    
+    Path2DSsave = Info2DS[FlightNumberStr,'Path2DSsave']
+    FlightNumber = Info2DS[FlightNumberStr,'FlightNumber'] 
+    FlightDate = (Info2DS[FlightNumberStr,'FlightDate']).astype(datetime.datetime)
+    
+    
+    #Combine files
+    files = [F for F in os.listdir(Path2DSsave) if F.endswith(".h5") and F.startswith('StereoImages_')]
+    for i,F in enumerate(files) : 
+        
+        Data_h5 = h5py.File(Path2DSsave + F, 'r')              
+        tmpImageCh0=np.array(Data_h5['ImageCh0'])
+        tmpImagePositionCh0=np.array(Data_h5['ImagePositionCh0'])
+        tmpSecondsCh0=np.array(Data_h5['SecondsCh0'])
+        tmpSlicesY_Ch0=np.array(Data_h5['SlicesY_Ch0'])
+        tmpImageCh1=np.array(Data_h5['ImageCh1'])
+        tmpImagePositionCh1=np.array(Data_h5['ImagePositionCh1'])
+        tmpSecondsCh1=np.array(Data_h5['SecondsCh1'])
+        tmpSlicesY_Ch1=np.array(Data_h5['SlicesY_Ch1'])
+        Data_h5.close()
+
+        
+        if i == 0 : 
+            ImageCh0 = tmpImageCh0
+            ImagePositionCh0= tmpImagePositionCh0
+            SecondsCh0=tmpSecondsCh0
+            SlicesY_Ch0=tmpSlicesY_Ch0
+            ImageCh1=tmpImageCh1
+            ImagePositionCh1=tmpImagePositionCh1
+            SecondsCh1=tmpSecondsCh1
+            SlicesY_Ch1=tmpSlicesY_Ch1
+        else:  
+            ImageCh0= np.append(ImageCh0,tmpImageCh0, axis=1)
+            ImagePositionCh0= np.append(ImagePositionCh0,tmpImagePositionCh0[1:]+ImagePositionCh0[-1], axis=0)
+            SecondsCh0= np.append(SecondsCh0, tmpSecondsCh0, axis=0)
+            SlicesY_Ch0= np.append(SlicesY_Ch0,tmpSlicesY_Ch0, axis=0)
+            ImageCh1= np.append(ImageCh1,tmpImageCh1, axis=1)
+            ImagePositionCh1= np.append(ImagePositionCh1,tmpImagePositionCh1[1:]+ImagePositionCh1[-1], axis=0)
+            SecondsCh1= np.append(SecondsCh1, tmpSecondsCh1, axis=0)
+            SlicesY_Ch1= np.append(SlicesY_Ch1, tmpSlicesY_Ch1, axis=0)
+       
+    
+    #plt.pcolormesh(ImageCh1)
+    #plt.vlines(ImagePositionCh1, ymin=0,ymax=128)
+    #plt.xlim([2000,2500])
+    
+    Mergedfilename='uman-2ds_faam_'+FlightDate.strftime("%Y%m%d")+'_v'+str(vnumber)+'_r'+str(rnumber)+'_'+FlightNumber+'_stereo_images.h5'
+    #save to file
+    h5f = h5py.File(Path2DSsave+Mergedfilename, 'w')
+    h5f.create_dataset('ImageCh0', data=ImageCh0)
+    h5f.create_dataset('ImagePositionCh0', data=ImagePositionCh0)
+    h5f.create_dataset('SecondsCh0', data=SecondsCh0)
+    h5f.create_dataset('ImageWidth_Ch0', data=SlicesY_Ch0)
+    h5f.create_dataset('ImageCh1', data=ImageCh1)
+    h5f.create_dataset('ImagePositionCh1', data=ImagePositionCh1)
+    h5f.create_dataset('SecondsCh1', data=SecondsCh1)
+    h5f.create_dataset('ImageWidthCh1', data=SlicesY_Ch1)
+    h5f.close()
 
