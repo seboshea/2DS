@@ -151,7 +151,7 @@ for FlightNumberStr in Flights :
     Info2DS = GetFlightInfo2DS()
     #FlightNumberStr = 'C171_dataPC'
     SizeThreshold  = 40 # min size particle to save 
-    #SaveStereoImagesh5(Info2DS,FlightNumberStr,SizeThreshold)
+    SaveStereoImagesh5(Info2DS,FlightNumberStr,SizeThreshold)
     
     vnumber = 0
     rnumber = 0
@@ -197,9 +197,9 @@ for FlightNumberStr in Flights :
             SlicesY_Ch1= np.append(SlicesY_Ch1, tmpSlicesY_Ch1, axis=0)
        
     
-    plt.pcolormesh(ImageCh1)
-    plt.vlines(ImagePositionCh1, ymin=0,ymax=128)
-    plt.xlim([102000,102500])
+    # plt.pcolormesh(ImageCh1)
+    # plt.vlines(ImagePositionCh1, ymin=0,ymax=128)
+    # plt.xlim([102000,102500])
     
     Mergedfilename='uman-2ds_faam_'+FlightDate.strftime("%Y%m%d")+'_v'+str(vnumber)+'_r'+str(rnumber)+'_'+FlightNumber+'_stereo_images.h5'
     #save to file
