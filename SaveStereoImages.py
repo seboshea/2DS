@@ -86,7 +86,7 @@ def SaveStereoImagesh5(Info2DS,FlightNumberStr,SizeThreshold):
         OutputImageCh0 = np.ones([128,int(np.nansum(OutputSlicesY_Ch0))], dtype=np.uint8)*255
         OutputImageCh1 = np.ones([128,int(np.nansum(OutputSlicesY_Ch1))], dtype=np.uint8)*255
         
-        # Look through select particles and put images in OutputImage
+        # select particles and put images in OutputImage
         for j, Idx in enumerate(Stereo_Idxs) : 
             # find each image in array 
             #channel 0
@@ -141,7 +141,9 @@ def SaveStereoImagesh5(Info2DS,FlightNumberStr,SizeThreshold):
    
 #Flights = ['C174_dataPC', 'C172_dataPC', 'C171_dataPC', 'C170_dataPC', 'C169_dataPC',
 #           'C098_dataPC', 'C097_dataPC'] 
-Flights = ['C171_dataPC', 'C170_dataPC', 'C169_dataPC', 'C098_dataPC', 'C097_dataPC'] 
+Flights = ['C097_dataPC'] 
+
+
 
 for FlightNumberStr in Flights : 
     print(FlightNumberStr)
@@ -149,7 +151,7 @@ for FlightNumberStr in Flights :
     Info2DS = GetFlightInfo2DS()
     #FlightNumberStr = 'C171_dataPC'
     SizeThreshold  = 40 # min size particle to save 
-    SaveStereoImagesh5(Info2DS,FlightNumberStr,SizeThreshold)
+    #SaveStereoImagesh5(Info2DS,FlightNumberStr,SizeThreshold)
     
     vnumber = 0
     rnumber = 0
@@ -195,9 +197,9 @@ for FlightNumberStr in Flights :
             SlicesY_Ch1= np.append(SlicesY_Ch1, tmpSlicesY_Ch1, axis=0)
        
     
-    #plt.pcolormesh(ImageCh1)
-    #plt.vlines(ImagePositionCh1, ymin=0,ymax=128)
-    #plt.xlim([2000,2500])
+    plt.pcolormesh(ImageCh1)
+    plt.vlines(ImagePositionCh1, ymin=0,ymax=128)
+    plt.xlim([102000,102500])
     
     Mergedfilename='uman-2ds_faam_'+FlightDate.strftime("%Y%m%d")+'_v'+str(vnumber)+'_r'+str(rnumber)+'_'+FlightNumber+'_stereo_images.h5'
     #save to file
