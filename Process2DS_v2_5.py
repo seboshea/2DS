@@ -33,7 +33,7 @@
 #v2.5 11/2/21
 # Probe settings passed to FindParticlesOnBothChannelsV2() functions via GetFlightInfo2DS()
 # All files saved to Info2DS[FlightNumberStr, 'Path2DSsave']
-# Add thresholds to IAT and colocation time histograms
+# Added thresholds to IAT and colocation time histograms
 
 
 import datetime
