@@ -446,6 +446,20 @@ def GetFlightInfo2DS():
     Info2DS['MAC_225','FlightNumber'] = '225'
     Info2DS['MAC_225','ArmSep'] = 63
     
+    Info2DS['MAC_226','Path2DS']= 'D:/MAC/226/2d-s/OasisOutput/'
+    Info2DS['MAC_226','Path2DSsave']= 'D:/MAC/226/2d-s/OasisOutput/Colocation/'
+    Info2DS['MAC_226','FlightDate'] = np.datetime64('2015-12-07 00:00:00')
+    Info2DS['MAC_226', 'ColocationThreshold'] = 2E-6
+    Info2DS['MAC_226', 'IAT_threshold'] =1E-6
+    Info2DS['MAC_226','TAS']=60 #m/s
+    Info2DS['MAC_226','ThresholdDeltaDiameterY']= 40 # um allowed difference in y diameter for stereo, -1 no threshold
+    Info2DS['MAC_226','ThresholdSize'] = 300 # Size to switch between stereo and standard psd
+    Info2DS['MAC_226','MeanXYFlag'] = 1 # 1= mean xy, 0= max
+    Info2DS['MAC_226','BiggestParticle'] = 1 # #BiggestParticle  # 0 = BBox, 1 = largest particle
+    Info2DS['MAC_226','FlightNumber'] = '226'
+    Info2DS['MAC_226','ArmSep'] = 63
+    
+    
     return Info2DS
 
 
@@ -838,7 +852,7 @@ def FindParticlesOnBothChannelsV2(filena, Info2DS,FlightNumberStr ):
             Idx = np.where(MaxDiameterY<=(MinDiameterY+ThresholdDeltaDiameterY)) #Select colocation indexes that meet size criteria
             print('Fraction of stereo above Dy threshold ='+str(len(Idx)/len(MinDiameterY)))
         
-        if len(ColocationSecondsCh1) > 0 and len(ColocationSecondsCh0) > 0 :
+        if len(ColocationSecondsCh1[Idx]) > 0 and len(ColocationSecondsCh0[Idx]) > 0 :
             if MeanXYFlag == 1: # mean xy
                 PSD_Colocate_1hzV2(Info2DS,FlightNumberStr,'dNdD_L_',Seconds_Ch0, DiameterX_Ch0, MeanXYDiameter_Ch0, Edge_Ch0, 
                                    Seconds_Ch1, DiameterX_Ch1, MeanXYDiameter_Ch1, Edge_Ch1,SaveFile,filena,0)
@@ -878,7 +892,7 @@ def PSD_Colocate_1hzV2(Info2DS,FlightNumberStr,SavePrefix,SecondsCh0, DiameterXC
 
     #Set up time bins
     #Startime=int(np.minimum(SecondsCh0[0], SecondsCh1[0]))
-    #Endtime=int(np.maximum(SecondsCh0[-1], SecondsCh1[-1]))
+    #Endtime=int(np.maximum(SecondsCh0[-1], SecondsCh1[-1]))    
     
     Startime=int(np.minimum(min(SecondsCh0), min(SecondsCh1)))
     Endtime=int(np.maximum(max(SecondsCh0), max(SecondsCh1)))
