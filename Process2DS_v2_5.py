@@ -459,6 +459,110 @@ def GetFlightInfo2DS():
     Info2DS['MAC_226','FlightNumber'] = '226'
     Info2DS['MAC_226','ArmSep'] = 63
     
+    Info2DS['MAC_227','Path2DS']= 'D:/MAC/227/2d-s/OasisOutput/'
+    Info2DS['MAC_227','Path2DSsave']= 'D:/MAC/227/2d-s/OasisOutput/Colocation/'
+    Info2DS['MAC_227','FlightDate'] = np.datetime64('2015-12-08 00:00:00')
+    Info2DS['MAC_227', 'ColocationThreshold'] = 2E-6
+    Info2DS['MAC_227', 'IAT_threshold'] =1E-6
+    Info2DS['MAC_227','TAS']=60 #m/s
+    Info2DS['MAC_227','ThresholdDeltaDiameterY']= 40 # um allowed difference in y diameter for stereo, -1 no threshold
+    Info2DS['MAC_227','ThresholdSize'] = 300 # Size to switch between stereo and standard psd
+    Info2DS['MAC_227','MeanXYFlag'] = 1 # 1= mean xy, 0= max
+    Info2DS['MAC_227','BiggestParticle'] = 1 # #BiggestParticle  # 0 = BBox, 1 = largest particle
+    Info2DS['MAC_227','FlightNumber'] = '227'
+    Info2DS['MAC_227','ArmSep'] = 63
+    
+    Info2DS['MAC_228','Path2DS']= 'D:/MAC/228/2d-s/OasisOutput/'
+    Info2DS['MAC_228','Path2DSsave']= 'D:/MAC/228/2d-s/OasisOutput/Colocation/'
+    Info2DS['MAC_228','FlightDate'] = np.datetime64('2015-12-09 00:00:00')
+    Info2DS['MAC_228', 'ColocationThreshold'] = 2E-6
+    Info2DS['MAC_228', 'IAT_threshold'] =1E-6
+    Info2DS['MAC_228','TAS']=60 #m/s
+    Info2DS['MAC_228','ThresholdDeltaDiameterY']= 40 # um allowed difference in y diameter for stereo, -1 no threshold
+    Info2DS['MAC_228','ThresholdSize'] = 300 # Size to switch between stereo and standard psd
+    Info2DS['MAC_228','MeanXYFlag'] = 1 # 1= mean xy, 0= max
+    Info2DS['MAC_228','BiggestParticle'] = 1 # #BiggestParticle  # 0 = BBox, 1 = largest particle
+    Info2DS['MAC_228','FlightNumber'] = '228'
+    Info2DS['MAC_228','ArmSep'] = 63
+    
+    Info2DS['MAC_230','Path2DS']= 'D:/MAC/230/2d-s/OasisOutput/'
+    Info2DS['MAC_230','Path2DSsave']= 'D:/MAC/230/2d-s/OasisOutput/Colocation/'
+    Info2DS['MAC_230','FlightDate'] = np.datetime64('2015-12-10 00:00:00')
+    Info2DS['MAC_230', 'ColocationThreshold'] = 2E-6
+    Info2DS['MAC_230', 'IAT_threshold'] =1E-6
+    Info2DS['MAC_230','TAS']=60 #m/s
+    Info2DS['MAC_230','ThresholdDeltaDiameterY']= 40 # um allowed difference in y diameter for stereo, -1 no threshold
+    Info2DS['MAC_230','ThresholdSize'] = 300 # Size to switch between stereo and standard psd
+    Info2DS['MAC_230','MeanXYFlag'] = 1 # 1= mean xy, 0= max
+    Info2DS['MAC_230','BiggestParticle'] = 1 # #BiggestParticle  # 0 = BBox, 1 = largest particle
+    Info2DS['MAC_230','FlightNumber'] = '230'
+    Info2DS['MAC_230','ArmSep'] = 63
+    
+    Info2DS['MAC_231','Path2DS']= 'D:/MAC/231/2d-s/OasisOut/'
+    Info2DS['MAC_231','Path2DSsave']= 'D:/MAC/231/2d-s/OasisOut/Colocation/'
+    Info2DS['MAC_231','FlightDate'] = np.datetime64('2015-12-11 00:00:00')
+    Info2DS['MAC_231', 'ColocationThreshold'] = 2E-6
+    Info2DS['MAC_231', 'IAT_threshold'] =1E-6
+    Info2DS['MAC_231','TAS']=60 #m/s
+    Info2DS['MAC_231','ThresholdDeltaDiameterY']= 40 # um allowed difference in y diameter for stereo, -1 no threshold
+    Info2DS['MAC_231','ThresholdSize'] = 300 # Size to switch between stereo and standard psd
+    Info2DS['MAC_231','MeanXYFlag'] = 1 # 1= mean xy, 0= max
+    Info2DS['MAC_231','BiggestParticle'] = 1 # #BiggestParticle  # 0 = BBox, 1 = largest particle
+    Info2DS['MAC_231','FlightNumber'] = '231'
+    Info2DS['MAC_231','ArmSep'] = 63
+    
+    Info2DS['MAC_232','Path2DS']= 'D:/MAC/232/2d-s/OasisOutput/'
+    Info2DS['MAC_232','Path2DSsave']= 'D:/MAC/232/2d-s/OasisOutput/Colocation/'
+    Info2DS['MAC_232','FlightDate'] = np.datetime64('2015-12-11 00:00:00')
+    Info2DS['MAC_232', 'ColocationThreshold'] = 2E-6
+    Info2DS['MAC_232', 'IAT_threshold'] =1E-6
+    Info2DS['MAC_232','TAS']=60 #m/s
+    Info2DS['MAC_232','ThresholdDeltaDiameterY']= 40 # um allowed difference in y diameter for stereo, -1 no threshold
+    Info2DS['MAC_232','ThresholdSize'] = 300 # Size to switch between stereo and standard psd
+    Info2DS['MAC_232','MeanXYFlag'] = 1 # 1= mean xy, 0= max
+    Info2DS['MAC_232','BiggestParticle'] = 1 # #BiggestParticle  # 0 = BBox, 1 = largest particle
+    Info2DS['MAC_232','FlightNumber'] = '232'
+    Info2DS['MAC_232','ArmSep'] = 63
+    
+    Info2DS['MAC_233','Path2DS']= 'D:/MAC/233/2d-s/OasisOutput/'
+    Info2DS['MAC_233','Path2DSsave']= 'D:/MAC/233/2d-s/OasisOutput/Colocation/'
+    Info2DS['MAC_233','FlightDate'] = np.datetime64('2015-12-11 00:00:00')
+    Info2DS['MAC_233', 'ColocationThreshold'] = 2E-6
+    Info2DS['MAC_233', 'IAT_threshold'] =1E-6
+    Info2DS['MAC_233','TAS']=60 #m/s
+    Info2DS['MAC_233','ThresholdDeltaDiameterY']= 40 # um allowed difference in y diameter for stereo, -1 no threshold
+    Info2DS['MAC_233','ThresholdSize'] = 300 # Size to switch between stereo and standard psd
+    Info2DS['MAC_233','MeanXYFlag'] = 1 # 1= mean xy, 0= max
+    Info2DS['MAC_233','BiggestParticle'] = 1 # #BiggestParticle  # 0 = BBox, 1 = largest particle
+    Info2DS['MAC_233','FlightNumber'] = '233'
+    Info2DS['MAC_233','ArmSep'] = 63
+    
+    Info2DS['MAC_234','Path2DS']= 'D:/MAC/234/2d-s/OasisOut/'
+    Info2DS['MAC_234','Path2DSsave']= 'D:/MAC/234/2d-s/OasisOut/Colocation/'
+    Info2DS['MAC_234','FlightDate'] = np.datetime64('2015-12-13 00:00:00')
+    Info2DS['MAC_234', 'ColocationThreshold'] = 2E-6
+    Info2DS['MAC_234', 'IAT_threshold'] =1E-6
+    Info2DS['MAC_234','TAS']=60 #m/s
+    Info2DS['MAC_234','ThresholdDeltaDiameterY']= 40 # um allowed difference in y diameter for stereo, -1 no threshold
+    Info2DS['MAC_234','ThresholdSize'] = 300 # Size to switch between stereo and standard psd
+    Info2DS['MAC_234','MeanXYFlag'] = 1 # 1= mean xy, 0= max
+    Info2DS['MAC_234','BiggestParticle'] = 1 # #BiggestParticle  # 0 = BBox, 1 = largest particle
+    Info2DS['MAC_234','FlightNumber'] = '234'
+    Info2DS['MAC_234','ArmSep'] = 63
+    
+    Info2DS['MAC_235','Path2DS']= 'D:/MAC/235/2d-s/OasisOut/'
+    Info2DS['MAC_235','Path2DSsave']= 'D:/MAC/235/2d-s/OasisOut/Colocation/'
+    Info2DS['MAC_235','FlightDate'] = np.datetime64('2015-12-14 00:00:00')
+    Info2DS['MAC_235', 'ColocationThreshold'] = 2E-6
+    Info2DS['MAC_235', 'IAT_threshold'] =1E-6
+    Info2DS['MAC_235','TAS']=60 #m/s
+    Info2DS['MAC_235','ThresholdDeltaDiameterY']= 40 # um allowed difference in y diameter for stereo, -1 no threshold
+    Info2DS['MAC_235','ThresholdSize'] = 300 # Size to switch between stereo and standard psd
+    Info2DS['MAC_235','MeanXYFlag'] = 1 # 1= mean xy, 0= max
+    Info2DS['MAC_235','BiggestParticle'] = 1 # #BiggestParticle  # 0 = BBox, 1 = largest particle
+    Info2DS['MAC_235','FlightNumber'] = '235'
+    Info2DS['MAC_235','ArmSep'] = 63
+    
     
     return Info2DS
 
