@@ -6,7 +6,7 @@
 #1) Rawfile processing using OASIS and Image Output as .h5 file. 
 #2) Add data paths and probes settings to GetFlightInfo2DS().
 #3) Info2DS = GetFlightInfo2DS()
-#4) BatchBothChannels(Info2DS,FlightNumberStr), find stereo particles and create PSDs using stereo and traditional.
+#4) BatchFindStereo(Info2DS,FlightNumberStr), find stereo particles and create PSDs using stereo and traditional.
 #5) HybridStereoProcessing(Info2DS,FlightNumberStr), combine traditional and stereo psds for all files in folder.
 
 #v1.0 - 25/08/20
@@ -56,7 +56,7 @@ from FlightInfo2DS import GetFlightInfo2DS
 #_________________________________________________________________________________
 #Loop through oasis .h5 files
 
-def BatchBothChannels(Info2DS, FlightNumberStr):
+def BatchFindStereo(Info2DS, FlightNumberStr):
     
     print(FlightNumberStr)
     #FlightNumberStr = 'C172'
@@ -70,7 +70,7 @@ def BatchBothChannels(Info2DS, FlightNumberStr):
     for filena in os.listdir(Path2DS):
         if filena.endswith(".h5") and filena.startswith('base'):
             print(filena)
-            FindParticlesOnBothChannelsV2(filena,Info2DS,FlightNumberStr)
+            FindStereo(filena,Info2DS,FlightNumberStr)
             Flag2DS(Path2DS,PathSave,'Export_'+filena,filena,  FlightDate)
 
 
@@ -81,7 +81,7 @@ def BatchBothChannels(Info2DS, FlightNumberStr):
 # Particles ColocationDelta < ColocationThreshold are classed as stereo particles
 # Additionally the difference in y diameter must be less than ThresholdDeltaDiameterY um
 
-def FindParticlesOnBothChannelsV2(filena, Info2DS,FlightNumberStr ):
+def FindStereo(filena, Info2DS,FlightNumberStr ):
     SaveFile =1
     
     Path2DS = Info2DS[FlightNumberStr, 'Path2DS']
