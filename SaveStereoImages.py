@@ -18,7 +18,7 @@ import matplotlib.colors as colors
 #import matplotlib.colors.Colormap
 import datetime
 import os
-from Process2DS_v2_5 import GetFlightInfo2DS
+from FlightInfo2DS import GetFlightInfo2DS
 
 
 

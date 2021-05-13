@@ -16,8 +16,8 @@ import datetime
 import netCDF4
 import matplotlib.pyplot as plt 
 import pandas as pd
-from Process2DS_v2_5 import GetFlightInfo2DS, BatchBothChannels,HybridStereoProcessing
-
+from Process2DS_v2_5 import BatchBothChannels,HybridStereoProcessing
+from FlightInfo2DS import GetFlightInfo2DS
 
 # #_________________________________________________________________
 # #load .h5 that has been generated using OASIS containing PSDs and data flags

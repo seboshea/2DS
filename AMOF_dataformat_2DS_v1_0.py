@@ -7,8 +7,8 @@ import datetime
 import netCDF4
 import matplotlib.pyplot as plt 
 import pandas as pd
-from Process2DS_v2_5 import GetFlightInfo2DS, BatchBothChannels,HybridStereoProcessing
-
+from Process2DS_v2_5 import BatchBothChannels,HybridStereoProcessing
+from FlightInfo2DS import GetFlightInfo2DS
 
 # Generate an .nc file for the 2DS that meets CEDA criteria
 
