@@ -44,7 +44,9 @@ from FlightInfo2DS import GetFlightInfo2DS
 def CovertTimeBase2NC(FAAMCore, VariableStr, TimeIndex, TimeDiff, FillValueOld,FillValueNew):
     tmp = np.array(FAAMCore[VariableStr][:])
     tmp_nc = tmp[TimeIndex]
-    tmp_nc[TimeDiff>=1] = FillValueNew
+    #tmp_nc[TimeDiff>=1] = FillValueNew
+    NanIdx = TimeIndex[TimeDiff>=1]
+    tmp_nc[NanIdx] = FillValueNew
     tmp_nc[tmp_nc == FillValueOld]= FillValueNew
     return tmp_nc
 
