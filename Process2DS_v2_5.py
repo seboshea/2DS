@@ -203,30 +203,12 @@ def FindStereo(filena, Info2DS,FlightNumberStr ):
     IAT_Ch0 = GetIAT_TimeInS_2DS(Seconds_Ch0)    
     IAT_Ch1 = GetIAT_TimeInS_2DS(Seconds_Ch1)
     
-    # PLot IAT histograms at 10 min intervals
-    IATHist(PathSave,IAT_Ch0,IAT_Ch1,Seconds_Ch0, Seconds_Ch1 )
-    
     # Plot IAT for both channels indpendently
-    if 1 == 1:
-        fig=plt.figure(figsize=(8,12)) 
-        plt.rcParams.update({'font.size': 12})
-        plt.subplot(2,1,1)
-        HistBins = np.logspace(-8,0,num=100)
-        IAT_Ch0_hist, tmp= np.histogram(IAT_Ch0,bins=HistBins)
-        HistBinsMid = (HistBins[:-1] + HistBins[1:]) / 2
-        plt.plot(HistBinsMid,IAT_Ch0_hist,marker='o', linewidth=0, color = 'r',label='Channel 0')       
-        IAT_Ch1_hist, tmp= np.histogram(IAT_Ch1,bins=HistBins)
-        plt.plot(HistBinsMid,IAT_Ch1_hist,marker='o', linewidth=0, color = 'c',label='Channel 1')
-        plt.vlines(IAT_threshold, ymin =0 , ymax= np.nanmax(IAT_Ch1_hist),color ='k', linestyle ='--')
-        plt.xscale('log')
-        plt.yscale('log')
-        plt.xlabel('Inter-arrival time, s')
-        plt.ylabel('Counts')
-        plt.legend()
-        #plt.title('IAT = '+str(IAT_treshold)+'s, Colocation = ' + str(ColocationThreshold)+ 's' )
-        #plt.savefig(Path2DS+filena[:-3]+'_IAT.png',dpi=200)
-        #plt.close(fig)
+    IATHist(PathSave,IAT_Ch0,IAT_Ch1,IAT_threshold,filena)
+    # PLot IAT histograms at 10 min intervals
+    IATHist_interval(PathSave,IAT_Ch0,IAT_Ch1,Seconds_Ch0, Seconds_Ch1 )
     
+    # Remove particles with IAT below IAT_threshold
     Seconds_Ch0[IAT_Ch0<IAT_threshold] =np.nan
     Seconds_Ch1[IAT_Ch1<IAT_threshold] =np.nan
     
@@ -274,36 +256,13 @@ def FindStereo(filena, Info2DS,FlightNumberStr ):
     ChIDX = (np.where(ChTimeDelta_low < ChTimeDelta_high,ChIDX_low, ChIDX_high)) # Index with lowest TimeDelta
     ChTimeDelta = (np.where(ChTimeDelta_low < ChTimeDelta_high,ChTimeDelta_low, ChTimeDelta_high)) # Lowest TimeDelta
 
+    print('Number stereo / not stereo')
+    print(len(ChTimeDelta[ChTimeDelta < ColocationThreshold])/len(ChTimeDelta[ChTimeDelta > ColocationThreshold]))
+     
     # Plot colocation time histogram
-    if 1 == 1:
-        #fig=plt.figure(figsize=(7,7)) 
-        #plt.rcParams.update({'font.size': 12})
-        plt.subplot(2,1,2)
-        
-        #log spaced bins but also include 0 
-        ColocationBinsEdge = np.logspace(-7,0,num=100)
-        ColocationBinsEdge = np.append([0],ColocationBinsEdge)
-        ColocationBinsMid=(ColocationBinsEdge[1:]+ColocationBinsEdge[0:-1]) /2
-        ColocationBinsMid[0]=0 
-        ColocationHist, ColocationBinsEdge =  np.histogram(ChTimeDelta, ColocationBinsEdge )
-        ColocationHist = np.where(ColocationHist == 0, np.nan, ColocationHist )        
-        #ColocationHist[ColocationHist==0] =np.nan
-        plt.plot(ColocationBinsMid,ColocationHist,'o')
-        #plt.hist(ChTimeDelta,HistBins)
-        plt.vlines(ColocationThreshold, ymin =0 , ymax= np.nanmax(ColocationHist), color ='k', linestyle ='--')
-        plt.xscale('symlog', linthreshx=1E-7)
-        plt.xlabel('Co-location time, s')
-        plt.ylabel('Counts')
-        #plt.title('zeros = '+ str(len(ChTimeDelta[ChTimeDelta == 0]))+', IAT = '+str(IAT_treshold)+'s, Colocation = ' + str(ColocationThreshold)+ 's' )
-        #plt.title('IAT = '+str(IAT_treshold)+'s Colocation = ' + str(ColocationThreshold)+ 's' )
-        plt.savefig(PathSave+filena[:-3]+'_deltat.png',dpi=200)
-        plt.close(fig)
-        
-        print('Number stereo / not stereo')
-        print(len(ChTimeDelta[ChTimeDelta < ColocationThreshold])/len(ChTimeDelta[ChTimeDelta > ColocationThreshold]))
-        
+    ColocationTimeHist(ChTimeDelta,ColocationThreshold,PathSave,filena)
     #Colocation histograms for 10 minute intervals
-    ColocationTimeHist(ChTimeDelta,Seconds_Ch1,PathSave)
+    ColocationTimeHist_interval(ChTimeDelta,Seconds_Ch1,PathSave)
 
     #Select colocated particle stats
     ColocationIDX = (ChIDX[ChTimeDelta <= ColocationThreshold]).astype(int) # Indexes are for channel 0 (same length as channel 1)
@@ -337,67 +296,14 @@ def FindStereo(filena, Info2DS,FlightNumberStr ):
 
     DeltaDiameterY_hist(ColocationDiameterY_Ch0, ColocationDiameterY_Ch1, ColocationDelta, ColocationThreshold, PathSave,filena)
   
-        # Plot CH1 vs CH0 diameter
-    if 1 == 1  and (len(ColocationDiameterY_Ch0) > 10):
-        fig=plt.figure(figsize=(8,12)) 
-        plt.rcParams.update({'font.size': 12})
-        plt.subplot(2,1,1)
-        plt.plot(ColocationMeanXYDiameter_Ch0,ColocationMeanXYDiameter_Ch1,'o',color='tab:gray',markersize=1)        
-        #plt.scatter(ColocationMeanXYDiameter_Ch0,ColocationMeanXYDiameter_Ch1,c= ColocationDelta,markersize=1)        
+    # Plot CH1 vs CH0 diameter for stereo particles
+    ChannelDComparison(ColocationDiameterY_Ch0,ColocationDiameterY_Ch1,ColocationMeanXYDiameter_Ch0,ColocationMeanXYDiameter_Ch1,
+                           IAT_threshold,ColocationThreshold,ColocationSlicesY_Ch0,ColocationSlicesY_Ch1,ColocationDelta,
+                            PathSave,filena)
         
-        plt.xlabel('Channel 0 mean, μm')
-        plt.ylabel('Channel 1 mean, μm')
-        plt.xscale('log')
-        plt.yscale('log')
-        plt.xlim([5,1280])
-        plt.ylim([5,1280])
-        plt.title('IAT = '+str(IAT_threshold)+'s, Colocation = ' + str(ColocationThreshold)+ 's' )
+    # Plot Midx vs Midx for colocated particles 
+    PlotArrayPositionSmallParticles(PathSave,filena, ColocationMeanXYDiameter_Ch0, ColocationMeanXYDiameter_Ch1, ColocationMIDx_Ch1, ColocationMIDx_Ch0)
 
-        plt.subplot(2,1,2)
-        #plt.plot(ColocationDiameterY_Ch0,ColocationDiameterY_Ch1,'o',color='tab:gray',markersize=1)        
-        plt.scatter(ColocationSlicesY_Ch0,ColocationSlicesY_Ch1,c= ColocationDelta, s=1)        
-        cbar=plt.colorbar(orientation='vertical')
-        cbar.set_label('Co-location time, s', rotation=270, labelpad=20)
-        
-        # linear fit
-        slope, intercept, r_value, p_value, std_err = stats.linregress(ColocationDiameterY_Ch0,ColocationDiameterY_Ch1)
-        plt.annotate('R = '+str(np.round(r_value,3)), xy=(0.05, 0.95), xycoords='axes fraction')
-        
-        SizeBins = np.arange(10,1280, step = 10 )
-        UpperBound = SizeBins**1.1 + 10
-        plt.plot(SizeBins,UpperBound, color ='r', linewidth=2 )
-        plt.plot(UpperBound, SizeBins, color ='r', linewidth=2 )
-        
-        plt.xlabel('Channel 0 Y diameter (bounding box), μm')
-        plt.ylabel('Channel 1 Y diameter (bounding box), μm')
-        plt.xscale('log')
-        plt.yscale('log')
-        plt.xlim([5,1280])
-        plt.ylim([5,1280])
-        plt.savefig(PathSave+filena[:-3]+'_colocationCH0vsCH1.png',dpi=200)
-        plt.close(fig)
-        
-    # Plot Midx vs Midx for colocated particles
-    ColocationMIDx_Ch1_lessthan = (np.where(np.logical_and(ColocationMeanXYDiameter_Ch0<20, ColocationMeanXYDiameter_Ch1<20),ColocationMIDx_Ch1,np.nan))
-    ColocationMIDx_Ch0_lessthan = (np.where(np.logical_and(ColocationMeanXYDiameter_Ch0<20, ColocationMeanXYDiameter_Ch1<20),ColocationMIDx_Ch0,np.nan))
-
-    if 1 == 1:
-        fig=plt.figure(figsize=(7,7)) 
-        plt.rcParams.update({'font.size': 12})
-        
-        HistBins = np.linspace(0,128,num=129, endpoint=True)
-        HistBinsMid = (HistBins[:-1] + HistBins[1:]) / 2
-        ColocationMIDx_Ch1_lessthan_hist, tmp= np.histogram(ColocationMIDx_Ch1_lessthan,bins=HistBins)
-        ColocationMIDx_Ch0_lessthan_hist, tmp= np.histogram(ColocationMIDx_Ch0_lessthan,bins=HistBins)
-        plt.plot(HistBinsMid, ColocationMIDx_Ch1_lessthan_hist, label ='Channel 1')
-        plt.plot(HistBinsMid, ColocationMIDx_Ch0_lessthan_hist, label ='Channel 0')       
-        plt.xlabel('Pixel number')
-        plt.ylabel('Counts')
-        plt.legend()
-        plt.savefig(PathSave+filena[:-3]+'_ArrayPosition.png',dpi=200)
-        plt.close(fig)
-    
-    
     #  Particles that are below the colocation threshold with two particles
     RepeatIDs_CH0=[x for x, y in zip(ColocationImageID_Ch0, ColocationImageID_Ch0[1:]) if x>=y]
     RepeatIDs_CH1=[x for x, y in zip(ColocationImageID_Ch1, ColocationImageID_Ch1[1:]) if x>=y]
@@ -1037,11 +943,45 @@ def HybridStereoPSD(FilePath,FileName, ThresholdSize):
     return FlagHybrid, Counts_PSD_Hybrid, dNdD_L_Hybrid, TimeMidBins_s_colocation, PSD_SizeMid
     
 
+
+#_______________________________________________________________________________________  
+#
+# Plot colocation time histogram
+
+def ColocationTimeHist(ChTimeDelta,ColocationThreshold,PathSave,filena) : 
+    
+    #fig=plt.figure(figsize=(7,7)) 
+    #plt.rcParams.update({'font.size': 12})
+    plt.subplot(2,1,2)
+    
+    #log spaced bins but also include 0 
+    ColocationBinsEdge = np.logspace(-7,0,num=100)
+    ColocationBinsEdge = np.append([0],ColocationBinsEdge)
+    ColocationBinsMid=(ColocationBinsEdge[1:]+ColocationBinsEdge[0:-1]) /2
+    ColocationBinsMid[0]=0 
+    ColocationHist, ColocationBinsEdge =  np.histogram(ChTimeDelta, ColocationBinsEdge )
+    ColocationHist = np.where(ColocationHist == 0, np.nan, ColocationHist )        
+    #ColocationHist[ColocationHist==0] =np.nan
+    plt.plot(ColocationBinsMid,ColocationHist,'o')
+    #plt.hist(ChTimeDelta,HistBins)
+    plt.vlines(ColocationThreshold, ymin =0 , ymax= np.nanmax(ColocationHist), color ='k', linestyle ='--')
+    plt.xscale('symlog', linthreshx=1E-7)
+    plt.xlabel('Co-location time, s')
+    plt.ylabel('Counts')
+    #plt.title('zeros = '+ str(len(ChTimeDelta[ChTimeDelta == 0]))+', IAT = '+str(IAT_treshold)+'s, Colocation = ' + str(ColocationThreshold)+ 's' )
+    #plt.title('IAT = '+str(IAT_treshold)+'s Colocation = ' + str(ColocationThreshold)+ 's' )
+    plt.savefig(PathSave+filena[:-3]+'_deltat.png',dpi=200)
+    #plt.close(fig)
+
+
+
+
+
 #_______________________________________________________________________________________  
 #Calculate histograms of colocation times at set intervals
 
 
-def ColocationTimeHist(ChTimeDelta,Seconds_Ch1,PathSave):
+def ColocationTimeHist_interval(ChTimeDelta,Seconds_Ch1,PathSave):
     
     Interval = 60
     FitMinX = 5E-6
@@ -1107,12 +1047,38 @@ def ColocationTimeHist(ChTimeDelta,Seconds_Ch1,PathSave):
     # plt.ylabel('Colocation mode, s')
     # plt.savefig(FullPathSave+'ColocationTimeMode_'+FirstTimeStr+'.png',dpi=200)
        
-    
+  
+#_______________________________________________________________________________________  
+ 
+#Plot and save IAT histogram for both channel   
+  
+def IATHist(PathSave,IAT_Ch0,IAT_Ch1,IAT_threshold,filena ):
+    fig=plt.figure(figsize=(8,12)) 
+    plt.rcParams.update({'font.size': 12})
+    plt.subplot(2,1,1)
+    HistBins = np.logspace(-8,0,num=100)
+    IAT_Ch0_hist, tmp= np.histogram(IAT_Ch0,bins=HistBins)
+    HistBinsMid = (HistBins[:-1] + HistBins[1:]) / 2
+    plt.plot(HistBinsMid,IAT_Ch0_hist,marker='o', linewidth=0, color = 'r',label='Channel 0')       
+    IAT_Ch1_hist, tmp= np.histogram(IAT_Ch1,bins=HistBins)
+    plt.plot(HistBinsMid,IAT_Ch1_hist,marker='o', linewidth=0, color = 'c',label='Channel 1')
+    plt.vlines(IAT_threshold, ymin =0 , ymax= np.nanmax(IAT_Ch1_hist),color ='k', linestyle ='--')
+    plt.xscale('log')
+    plt.yscale('log')
+    plt.xlabel('Inter-arrival time, s')
+    plt.ylabel('Counts')
+    plt.legend()
+    #plt.title('IAT = '+str(IAT_treshold)+'s, Colocation = ' + str(ColocationThreshold)+ 's' )
+    plt.savefig(PathSave+filena[:-3]+'_IAT.png',dpi=200)
+    #plt.close(fig)
     
     
 #_______________________________________________________________________________________  
 
-def IATHist(PathSave,IAT_Ch0,IAT_Ch1,Seconds_Ch0, Seconds_Ch1 ):
+# Plot and save IAT histograms for a given time interval
+
+
+def IATHist_interval(PathSave,IAT_Ch0,IAT_Ch1,Seconds_Ch0, Seconds_Ch1 ):
 
     Interval = 60
     IATBinsEdge = np.logspace(-7,0,num=100)
@@ -1348,5 +1314,74 @@ def OASIS_svol(Diameter,ArmSep, ArrayElements,ProbeRes,TAS ):
     return sVol
 
 #____________________________________________________________________________________
+# Scatter plots of diameter from CH0 and CH1 for particles classified as stereo
 
+def ChannelDComparison(ColocationDiameterY_Ch0,ColocationDiameterY_Ch1,ColocationMeanXYDiameter_Ch0,ColocationMeanXYDiameter_Ch1,
+                       IAT_threshold,ColocationThreshold,ColocationSlicesY_Ch0,ColocationSlicesY_Ch1,ColocationDelta,
+                        PathSave,filena) : 
+    # Plot CH1 vs CH0 diameter
+    if (len(ColocationDiameterY_Ch0) > 10):
+        fig=plt.figure(figsize=(8,12)) 
+        plt.rcParams.update({'font.size': 12})
+        plt.subplot(2,1,1)
+        plt.plot(ColocationMeanXYDiameter_Ch0,ColocationMeanXYDiameter_Ch1,'o',color='tab:gray',markersize=1)        
+        #plt.scatter(ColocationMeanXYDiameter_Ch0,ColocationMeanXYDiameter_Ch1,c= ColocationDelta,markersize=1)        
+        
+        plt.xlabel('Channel 0 mean, μm')
+        plt.ylabel('Channel 1 mean, μm')
+        plt.xscale('log')
+        plt.yscale('log')
+        plt.xlim([5,1280])
+        plt.ylim([5,1280])
+        plt.title('IAT = '+str(IAT_threshold)+'s, Colocation = ' + str(ColocationThreshold)+ 's' )
 
+        plt.subplot(2,1,2)
+        #plt.plot(ColocationDiameterY_Ch0,ColocationDiameterY_Ch1,'o',color='tab:gray',markersize=1)        
+        plt.scatter(ColocationSlicesY_Ch0,ColocationSlicesY_Ch1,c= ColocationDelta, s=1)        
+        cbar=plt.colorbar(orientation='vertical')
+        cbar.set_label('Co-location time, s', rotation=270, labelpad=20)
+        
+        # linear fit
+        slope, intercept, r_value, p_value, std_err = stats.linregress(ColocationDiameterY_Ch0,ColocationDiameterY_Ch1)
+        plt.annotate('R = '+str(np.round(r_value,3)), xy=(0.05, 0.95), xycoords='axes fraction')
+        
+        SizeBins = np.arange(10,1280, step = 10 )
+        UpperBound = SizeBins**1.1 + 10
+        plt.plot(SizeBins,UpperBound, color ='r', linewidth=2 )
+        plt.plot(UpperBound, SizeBins, color ='r', linewidth=2 )
+        
+        plt.xlabel('Channel 0 Y diameter (bounding box), μm')
+        plt.ylabel('Channel 1 Y diameter (bounding box), μm')
+        plt.xscale('log')
+        plt.yscale('log')
+        plt.xlim([5,1280])
+        plt.ylim([5,1280])
+        plt.savefig(PathSave+filena[:-3]+'_colocationCH0vsCH1.png',dpi=200)
+        plt.close(fig)
+        
+#____________________________________________________________________________________
+#
+# plot array position for stereo particles below certain size
+
+def PlotArrayPositionSmallParticles(PathSave,filena, ColocationMeanXYDiameter_Ch0, ColocationMeanXYDiameter_Ch1, ColocationMIDx_Ch1, ColocationMIDx_Ch0): 
+    
+    ColocationMIDx_Ch1_lessthan = (np.where(np.logical_and(ColocationMeanXYDiameter_Ch0<20, ColocationMeanXYDiameter_Ch1<20),ColocationMIDx_Ch1,np.nan))
+    ColocationMIDx_Ch0_lessthan = (np.where(np.logical_and(ColocationMeanXYDiameter_Ch0<20, ColocationMeanXYDiameter_Ch1<20),ColocationMIDx_Ch0,np.nan)) 
+    
+    fig=plt.figure(figsize=(7,7)) 
+    plt.rcParams.update({'font.size': 12})
+    
+    HistBins = np.linspace(0,128,num=129, endpoint=True)
+    HistBinsMid = (HistBins[:-1] + HistBins[1:]) / 2
+    ColocationMIDx_Ch1_lessthan_hist, tmp= np.histogram(ColocationMIDx_Ch1_lessthan,bins=HistBins)
+    ColocationMIDx_Ch0_lessthan_hist, tmp= np.histogram(ColocationMIDx_Ch0_lessthan,bins=HistBins)
+    plt.plot(HistBinsMid, ColocationMIDx_Ch1_lessthan_hist, label ='Channel 1')
+    plt.plot(HistBinsMid, ColocationMIDx_Ch0_lessthan_hist, label ='Channel 0')       
+    plt.xlabel('Pixel number')
+    plt.ylabel('Counts')
+    plt.legend()
+    plt.savefig(PathSave+filena[:-3]+'_ArrayPosition.png',dpi=200)
+    plt.close(fig)
+    
+#____________________________________________________________________________________
+#
