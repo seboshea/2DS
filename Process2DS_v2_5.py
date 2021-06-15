@@ -34,11 +34,13 @@
 # Probe settings passed to FindParticlesOnBothChannelsV2() functions via GetFlightInfo2DS()
 # All files saved to Info2DS[FlightNumberStr, 'Path2DSsave']
 # Added thresholds to IAT and colocation time histograms
+# Rename FindParticlesOnBothChannelsV2() to FindStereo()
+# Moved plotting scripts in FindStereo to separate functions.
 
 
 import datetime
 import numpy as np
-import pandas as pd
+#import pandas as pd
 #from netCDF4 import Dataset
 #import math
 #import bisect
@@ -47,7 +49,7 @@ import h5py
 import matplotlib.pyplot as plt  
 import matplotlib.dates as mdates
 import os
-import netCDF4
+#import netCDF4
 #from scipy import stats
 from scipy.optimize import curve_fit
 from scipy import stats
@@ -63,7 +65,7 @@ def BatchFindStereo(Info2DS, FlightNumberStr):
     Path2DS = Info2DS[FlightNumberStr, 'Path2DS']
     PathSave = Info2DS[FlightNumberStr, 'Path2DSsave']
     FlightDate = Info2DS[FlightNumberStr,'FlightDate']
-    
+
     if not os.path.exists(PathSave):
         os.makedirs(PathSave)
     
