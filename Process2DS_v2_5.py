@@ -1071,7 +1071,7 @@ def IATHist(PathSave,IAT_Ch0,IAT_Ch1,IAT_threshold,filena ):
     plt.ylabel('Counts')
     plt.legend()
     #plt.title('IAT = '+str(IAT_treshold)+'s, Colocation = ' + str(ColocationThreshold)+ 's' )
-    plt.savefig(PathSave+filena[:-3]+'_IAT.png',dpi=200)
+    #plt.savefig(PathSave+filena[:-3]+'_IAT.png',dpi=200)
     #plt.close(fig)
     
     
