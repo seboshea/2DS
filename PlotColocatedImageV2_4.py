@@ -29,7 +29,7 @@
 # Simplified method to search for individual image within 'ImageData'. 
 # Only selects files to plot images where colocation .h5 file already exists
 # Catches error if a stereo image can't be found within 'ImageData'.
-
+# Add time period to plot images for
 
 import numpy as np 
 import h5py
@@ -46,7 +46,19 @@ from FlightInfo2DS import GetFlightInfo2DS
 # Loop through .h5 image files in folder
 
 
-def PlotAllImages(Info2DS,FlightNumberStr):  
+def PlotAllImages(Info2DS,FlightNumberStr): 
+    
+    # Time period to plot images 
+    StartTimeStr = '00:04:23' # '-1' = plot all 
+    EndTimeStr = '00:04:23'
+
+    if StartTimeStr != '-1' : 
+        hms = [3600,60,1]
+        StartTime = sum([a*b for a,b in zip(hms, map(int,StartTimeStr.split(':')))])
+        EndTime = sum([a*b for a,b in zip(hms, map(int,EndTimeStr.split(':')))])
+    else : 
+        StartTime  = -1
+        EndTime = -1
 
     Path2DSsave = Info2DS[FlightNumberStr,'Path2DSsave']
     tmp = [F for F in os.listdir(Path2DSsave) if F.endswith(".h5") and F.startswith('Colocate_')]
@@ -56,7 +68,7 @@ def PlotAllImages(Info2DS,FlightNumberStr):
     
     for filena in files :
         filena.replace('Colocate_','')
-        BatchPlotImages_2Channels(Info2DS,FlightNumberStr,filena)
+        BatchPlotImages_2Channels(Info2DS,FlightNumberStr,filena,StartTime,EndTime )
         
     #filena = files[0] # select file index to plot. 
     #BatchPlotImages_2Channels(Info2DS,FlightNumberStr,filena)
@@ -66,7 +78,7 @@ def PlotAllImages(Info2DS,FlightNumberStr):
 #__________________________________________________________________________________
 # Plot all colocated images in .h5 image file
 
-def BatchPlotImages_2Channels(Info2DS,FlightNumberStr,filena):
+def BatchPlotImages_2Channels(Info2DS,FlightNumberStr,filena,StartTime,EndTime ):
     
     Path2DS = Info2DS[FlightNumberStr,'Path2DS']
     Path2DSsave = Info2DS[FlightNumberStr,'Path2DSsave']
@@ -122,7 +134,8 @@ def BatchPlotImages_2Channels(Info2DS,FlightNumberStr,filena):
                 #if (((ColocationMeanXYDiameter_Ch1[x] > SizeThreshold) or (ColocationMeanXYDiameter_Ch0[x] > SizeThreshold) ) and ColocationEdgeCH0[x] == 0 and ColocationEdgeCH1[x] == 0): 
                 if (((ColocationMeanXYDiameter_Ch1[x] > MinSizeThreshold) or (ColocationMeanXYDiameter_Ch0[x] > MinSizeThreshold)) 
                     and ((ColocationMeanXYDiameter_Ch1[x] < MaxSizeThreshold) or (ColocationMeanXYDiameter_Ch0[x] > MaxSizeThreshold))
-                    and (ColocationEdgeCH0[x] == 0 and ColocationEdgeCH1[x] == 0)): 
+                    and (ColocationEdgeCH0[x] == 0 and ColocationEdgeCH1[x] == 0)
+                    and (((ColocationParticleBufferTimeS_Ch0[x] > StartTime) and (ColocationParticleBufferTimeS_Ch0[x] < EndTime)) or (StartTime == -1))) : 
                      
                     # Flag images using maxD > minD**1.1 + 10
                     #MinDiameterY = min(ColocationSlicesY_Ch0[x], ColocationSlicesY_Ch1[x])
