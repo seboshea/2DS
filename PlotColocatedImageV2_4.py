@@ -49,8 +49,8 @@ from FlightInfo2DS import GetFlightInfo2DS
 def PlotAllImages(Info2DS,FlightNumberStr): 
     
     # Time period to plot images 
-    StartTimeStr = '00:04:23' # '-1' = plot all 
-    EndTimeStr = '00:04:23'
+    StartTimeStr = '00:00:00' # '-1' = plot all 
+    EndTimeStr = '00:10:00'
 
     if StartTimeStr != '-1' : 
         hms = [3600,60,1]
