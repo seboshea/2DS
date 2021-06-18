@@ -33,9 +33,19 @@ SizeThreshold  = 50 # min size particle to save
 #            'C174_dataPC', 'C172_dataPC', 'C171_dataPC', 'C170_dataPC', 'C169_dataPC',
 #            'C098_dataPC', 'C097_dataPC']
 
-Flights = ['B894_dataPC']
+Flights = ['C240_dataPC']
  
-#missed 231
+# Time period to plot images 
+StartTimeStr = '14:09:59' # '-1' = plot all 
+EndTimeStr = '15:26:16'
+
+if StartTimeStr != '-1' : 
+    hms = [3600,60,1]
+    StartTime = sum([a*b for a,b in zip(hms, map(int,StartTimeStr.split(':')))])
+    EndTime = sum([a*b for a,b in zip(hms, map(int,EndTimeStr.split(':')))])
+else : 
+    StartTime  = -1
+    EndTime = -1
 
 for FlightNumberStr in Flights : 
     print(FlightNumberStr)
@@ -80,7 +90,8 @@ for FlightNumberStr in Flights :
         #Indexes to save images
         Stereo_Idxs = np.nonzero(((ColocationMeanXYDiameter_Ch1 > SizeThreshold) | (ColocationMeanXYDiameter_Ch0 > SizeThreshold))
                        & ((ColocationEdgeCH0 == 0) & (ColocationEdgeCH1 == 0))
-                       & ((ThresholdDeltaDimaterY == -1) | (np.absolute(ColocationSlicesY_Ch0 - ColocationSlicesY_Ch1) < ThresholdDeltaDimaterY)))
+                       & ((ThresholdDeltaDimaterY == -1) | (np.absolute(ColocationSlicesY_Ch0 - ColocationSlicesY_Ch1) < ThresholdDeltaDimaterY))
+                       & (((ColocationSecondsCh0 > StartTime) & (ColocationSecondsCh0 < EndTime)) | (StartTime == -1)))
         Stereo_Idxs=Stereo_Idxs[0]
         
         # Number of slices per stereo images
