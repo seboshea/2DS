@@ -93,11 +93,12 @@ def BatchPlotImages_2Channels(Info2DS,FlightNumberStr,filena,StartTime,EndTime )
     #ThresholdDeltaDimaterY = 40 # threshold size difference between y dimension of stereo images. Images above threshold are coloured grey.
     #ThresholdDiameterYExponent = 1.1
 
-    #Nfraction2Plot = 1 # fraction of particles to plot 
     MinSizeThreshold  = 50 # min size particle to plot
     MaxSizeThreshold = 2000
     Nslices = 1600 # Total number of slices per plot
     Npanels =4 # number of panels per plot
+    
+    #Load stereo particle stats
     Data_h5 = h5py.File(Path2DSsave + 'Colocate_'+filena, 'r')              
     ColocationParticleBufferTimeS_Ch0=np.array(Data_h5['ColocationParticleBufferTimeS_Ch0'])
     ColocationParticleBufferTimeS_Ch1=np.array(Data_h5['ColocationParticleBufferTimeS_Ch1'])
@@ -110,11 +111,21 @@ def BatchPlotImages_2Channels(Info2DS,FlightNumberStr,filena,StartTime,EndTime )
     ColocationDelta = np.array(Data_h5['ColocationDelta'])
     ColocationSlicesY_Ch0 = np.array(Data_h5['ColocationSlicesY_Ch0'])
     ColocationSlicesY_Ch1 = np.array(Data_h5['ColocationSlicesY_Ch1'])
-
+    Data_h5.close()
+    
+    #Load image meta data
+    Data_h5 = h5py.File(Path2DS + 'Colocate_'+filena, 'r')
+    ImageTimes=np.array(Data_h5['ImageTimes'][:,0])
+    ImageSlices  =np.array(Data_h5['ImageTimes'][:,1])
+    ImageID_Ch0 =np.array(Data_h5['ImageTimes'][:,2])
+    ImageID_Ch1 =np.array(Data_h5['ImageTimes'][:,2])
+    ImageSlices[ImageSlices<0] = np.nan
+    #Find start position of image within ImageData
+    ImagePosition = np.cumsum(ImageSlices, axis = 0)
+    ImagePosition = np.append(0, ImagePosition)
     Data_h5.close()
 
-    
-    AllColocationImages=np.zeros([128,Nslices])
+    AllColocationImages=np.zeros([128,Nslices]) # where to store stereo images
     
     ZerosThreesZeros =np.append(np.zeros([128,1]),3*np.ones([128,1]), axis = 1)
     ZerosThreesZeros =np.append(ZerosThreesZeros,np.zeros([128,1]), axis = 1)   
@@ -149,7 +160,8 @@ def BatchPlotImages_2Channels(Info2DS,FlightNumberStr,filena,StartTime,EndTime )
                     else :
                         PairFlag = np.where(DeltaDiameterY>ThresholdDeltaDimaterY, 0,1)
                     
-                    ImagePair =  CombineImage2Channels(Path2DS,FileName,ColocationParticleBufferTimeS_Ch0[x],ColocationImageID_Ch0[x],ColocationParticleBufferTimeS_Ch1[x],ColocationImageID_Ch1[x],PairFlag)                        
+                    ImagePair =  CombineImage2Channels(Path2DS,FileName,ColocationParticleBufferTimeS_Ch0[x],ColocationImageID_Ch0[x],ColocationParticleBufferTimeS_Ch1[x],ColocationImageID_Ch1[x],PairFlag,
+                                                       ImageTimes, ImageID_Ch0, ImageID_Ch1, ImagePosition)                        
                     ImagePair = np.append(ImagePair,ZerosThreesZeros, axis = 1)
                     ImageSize = np.size(ImagePair,axis=1)
                     IDXstart = TotalSize
@@ -174,17 +186,18 @@ def BatchPlotImages_2Channels(Info2DS,FlightNumberStr,filena,StartTime,EndTime )
 #__________________________________________________________________________________
 
         
-def CombineImage2Channels(ImagePath,FileName,ParticleBufferTime_Ch0,ParticleID_Ch0,ParticleBufferTime_Ch1,ParticleID_Ch1, PairFlag):
+def CombineImage2Channels(ImagePath,FileName,ParticleBufferTime_Ch0,ParticleID_Ch0,ParticleBufferTime_Ch1,ParticleID_Ch1, PairFlag,
+                          ImageTimes, ImageID_Ch0, ImageID_Ch1, ImagePosition):
     
-    Data_h5 = h5py.File(ImagePath + FileName, 'r')
-    ImageTimes=np.array(Data_h5['ImageTimes'][:,0])
-    ImageSlices  =np.array(Data_h5['ImageTimes'][:,1])
-    ImageID_Ch0 =np.array(Data_h5['ImageTimes'][:,2])
-    ImageID_Ch1 =np.array(Data_h5['ImageTimes'][:,2])
-    ImageSlices[ImageSlices<0] = np.nan
-    #Find start position of image within ImageData
-    ImagePosition = np.cumsum(ImageSlices, axis = 0)
-    ImagePosition = np.append(0, ImagePosition)
+    Data_h5_Im = h5py.File(ImagePath + FileName, 'r')
+    # ImageTimes=np.array(Data_h5['ImageTimes'][:,0])
+    # ImageSlices  =np.array(Data_h5['ImageTimes'][:,1])
+    # ImageID_Ch0 =np.array(Data_h5['ImageTimes'][:,2])
+    # ImageID_Ch1 =np.array(Data_h5['ImageTimes'][:,2])
+    # ImageSlices[ImageSlices<0] = np.nan
+    # #Find start position of image within ImageData
+    # ImagePosition = np.cumsum(ImageSlices, axis = 0)
+    # ImagePosition = np.append(0, ImagePosition)
     
     # Channel 0 
     #Search for particle image
@@ -198,7 +211,7 @@ def CombineImage2Channels(ImagePath,FileName,ParticleBufferTime_Ch0,ParticleID_C
         if len(i) > 1:
             print('Multiple particles with same ID=' + str(i))
             i=i[0]
-        ImageCH0 = np.array(Data_h5['ImageData'][:,int(ImagePosition[i]):int(ImagePosition[i+1])]) 
+        ImageCH0 = np.array(Data_h5_Im['ImageData'][:,int(ImagePosition[i]):int(ImagePosition[i+1])]) 
         ImageCH0[ImageCH0 == 0 ] = 1
         ImageCH0[ImageCH0 == 255 ] = 0  
 
@@ -213,7 +226,7 @@ def CombineImage2Channels(ImagePath,FileName,ParticleBufferTime_Ch0,ParticleID_C
         if len(i) > 1:
             print('Multiple particles with same ID=' + str(i))
             i=i[0]
-        ImageCH1 = np.array(Data_h5['ImageData'][:,int(ImagePosition[i]):int(ImagePosition[i+1])]) 
+        ImageCH1 = np.array(Data_h5_Im['ImageData'][:,int(ImagePosition[i]):int(ImagePosition[i+1])]) 
         ImageCH1[ImageCH1 == 0 ] = 2
         ImageCH1[ImageCH1 == 255 ] = 0
 
@@ -222,7 +235,7 @@ def CombineImage2Channels(ImagePath,FileName,ParticleBufferTime_Ch0,ParticleID_C
     if PairFlag == 0 : 
         ImageCombine = np.where(ImageCombine >0, 4, ImageCombine) # colour differently if PairFlag == 0
     
-    Data_h5.close()  
+    Data_h5_Im.close()  
     
     return ImageCombine#, ImageSize
 
