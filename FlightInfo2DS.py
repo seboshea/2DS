@@ -95,6 +95,19 @@ def GetFlightInfo2DS():
     Info2DS['B894_dataPC','FlightNumber'] = 'b894'
     Info2DS['B894_dataPC','ArmSep'] = 63
     
+    Info2DS['C240_dataPC','Path2DS']= 'D:/PICASSO/rawdata/C240/2D-S/Output/'
+    Info2DS['C240_dataPC','Path2DSsave']= 'D:/PICASSO/rawdata/C240/2D-S/Output/Colocation/'
+    Info2DS['C240_dataPC','FlightDate'] = np.datetime64('2021-06-07 00:00:00')
+    Info2DS['C240_dataPC', 'IAT_threshold'] =1E-5
+    Info2DS['C240_dataPC', 'ColocationThreshold'] = 1E-6
+    Info2DS['C240_dataPC','TAS']=100 #m/s
+    Info2DS['C240_dataPC','ThresholdDeltaDiameterY']= 40 # um allowed difference in y diameter for stereo, -1 no threshold
+    Info2DS['C240_dataPC','ThresholdSize'] = 300 # Size to switch between stereo and standard psd
+    Info2DS['C240_dataPC','MeanXYFlag'] = 1 # 1= mean xy, 0= max
+    Info2DS['C240_dataPC','BiggestParticle'] = 1 # #BiggestParticle  # 0 = BBox, 1 = largest particle
+    Info2DS['C240_dataPC','FlightNumber'] = 'c240'
+    Info2DS['C240_dataPC','ArmSep'] = 63
+    
     
     Info2DS['C174_dataPC','Path2DS']= 'D:/PICASSO/rawdata/C174/2ds/Output/'
     Info2DS['C174_dataPC','Path2DSsave']= 'D:/PICASSO/rawdata/C174/2ds/Output/Colocation/'

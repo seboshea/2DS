@@ -114,7 +114,7 @@ def BatchPlotImages_2Channels(Info2DS,FlightNumberStr,filena,StartTime,EndTime )
     Data_h5.close()
     
     #Load image meta data
-    Data_h5 = h5py.File(Path2DS + 'Colocate_'+filena, 'r')
+    Data_h5 = h5py.File(Path2DS + 'Export_'+filena, 'r')
     ImageTimes=np.array(Data_h5['ImageTimes'][:,0])
     ImageSlices  =np.array(Data_h5['ImageTimes'][:,1])
     ImageID_Ch0 =np.array(Data_h5['ImageTimes'][:,2])
@@ -123,7 +123,7 @@ def BatchPlotImages_2Channels(Info2DS,FlightNumberStr,filena,StartTime,EndTime )
     #Find start position of image within ImageData
     ImagePosition = np.cumsum(ImageSlices, axis = 0)
     ImagePosition = np.append(0, ImagePosition)
-    Data_h5.close()
+    
 
     AllColocationImages=np.zeros([128,Nslices]) # where to store stereo images
     
@@ -160,8 +160,8 @@ def BatchPlotImages_2Channels(Info2DS,FlightNumberStr,filena,StartTime,EndTime )
                     else :
                         PairFlag = np.where(DeltaDiameterY>ThresholdDeltaDimaterY, 0,1)
                     
-                    ImagePair =  CombineImage2Channels(Path2DS,FileName,ColocationParticleBufferTimeS_Ch0[x],ColocationImageID_Ch0[x],ColocationParticleBufferTimeS_Ch1[x],ColocationImageID_Ch1[x],PairFlag,
-                                                       ImageTimes, ImageID_Ch0, ImageID_Ch1, ImagePosition)                        
+                    ImagePair =  CombineImage2Channels(ColocationParticleBufferTimeS_Ch0[x],ColocationImageID_Ch0[x],ColocationParticleBufferTimeS_Ch1[x],ColocationImageID_Ch1[x],PairFlag,
+                                                       ImageTimes, ImageID_Ch0, ImageID_Ch1, ImagePosition, Data_h5)                        
                     ImagePair = np.append(ImagePair,ZerosThreesZeros, axis = 1)
                     ImageSize = np.size(ImagePair,axis=1)
                     IDXstart = TotalSize
@@ -181,15 +181,15 @@ def BatchPlotImages_2Channels(Info2DS,FlightNumberStr,filena,StartTime,EndTime )
             
             PlotAllColocationImages(AllColocationImages, FirstTime, LastTime,Npanels,Nslices,filena,SavePath)
             #x+=1 
-            
+        Data_h5.close()
 
 #__________________________________________________________________________________
 
         
-def CombineImage2Channels(ImagePath,FileName,ParticleBufferTime_Ch0,ParticleID_Ch0,ParticleBufferTime_Ch1,ParticleID_Ch1, PairFlag,
-                          ImageTimes, ImageID_Ch0, ImageID_Ch1, ImagePosition):
+def CombineImage2Channels(ParticleBufferTime_Ch0,ParticleID_Ch0,ParticleBufferTime_Ch1,ParticleID_Ch1, PairFlag,
+                          ImageTimes, ImageID_Ch0, ImageID_Ch1, ImagePosition,Data_h5):
     
-    Data_h5_Im = h5py.File(ImagePath + FileName, 'r')
+    #Data_h5_Im = h5py.File(ImagePath + FileName, 'r')
     # ImageTimes=np.array(Data_h5['ImageTimes'][:,0])
     # ImageSlices  =np.array(Data_h5['ImageTimes'][:,1])
     # ImageID_Ch0 =np.array(Data_h5['ImageTimes'][:,2])
@@ -211,7 +211,7 @@ def CombineImage2Channels(ImagePath,FileName,ParticleBufferTime_Ch0,ParticleID_C
         if len(i) > 1:
             print('Multiple particles with same ID=' + str(i))
             i=i[0]
-        ImageCH0 = np.array(Data_h5_Im['ImageData'][:,int(ImagePosition[i]):int(ImagePosition[i+1])]) 
+        ImageCH0 = np.array(Data_h5['ImageData'][:,int(ImagePosition[i]):int(ImagePosition[i+1])]) 
         ImageCH0[ImageCH0 == 0 ] = 1
         ImageCH0[ImageCH0 == 255 ] = 0  
 
@@ -226,7 +226,7 @@ def CombineImage2Channels(ImagePath,FileName,ParticleBufferTime_Ch0,ParticleID_C
         if len(i) > 1:
             print('Multiple particles with same ID=' + str(i))
             i=i[0]
-        ImageCH1 = np.array(Data_h5_Im['ImageData'][:,int(ImagePosition[i]):int(ImagePosition[i+1])]) 
+        ImageCH1 = np.array(Data_h5['ImageData'][:,int(ImagePosition[i]):int(ImagePosition[i+1])]) 
         ImageCH1[ImageCH1 == 0 ] = 2
         ImageCH1[ImageCH1 == 255 ] = 0
 
@@ -235,7 +235,7 @@ def CombineImage2Channels(ImagePath,FileName,ParticleBufferTime_Ch0,ParticleID_C
     if PairFlag == 0 : 
         ImageCombine = np.where(ImageCombine >0, 4, ImageCombine) # colour differently if PairFlag == 0
     
-    Data_h5_Im.close()  
+    #Data_h5_Im.close()  
     
     return ImageCombine#, ImageSize
 
