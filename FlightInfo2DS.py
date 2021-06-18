@@ -88,7 +88,7 @@ def GetFlightInfo2DS():
     Info2DS['B894_dataPC', 'IAT_threshold'] =1E-5
     Info2DS['B894_dataPC', 'ColocationThreshold'] = 5E-7
     Info2DS['B894_dataPC','TAS']=100 #m/s
-    Info2DS['B894_dataPC','ThresholdDeltaDiameterY']= -1 # um allowed difference in y diameter for stereo, -1 not threshold
+    Info2DS['B894_dataPC','ThresholdDeltaDiameterY']= 40 # um allowed difference in y diameter for stereo, -1 not threshold
     Info2DS['B894_dataPC','ThresholdSize'] = 300 # Size to switch between stereo and standard psd
     Info2DS['B894_dataPC','MeanXYFlag'] = 1 # 1= mean xy, 0= max
     Info2DS['B894_dataPC','BiggestParticle'] = 1 # #BiggestParticle  # 0 = BBox, 1 = largest particle

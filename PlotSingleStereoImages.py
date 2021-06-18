@@ -33,7 +33,7 @@ SizeThreshold  = 50 # min size particle to save
 #            'C174_dataPC', 'C172_dataPC', 'C171_dataPC', 'C170_dataPC', 'C169_dataPC',
 #            'C098_dataPC', 'C097_dataPC']
 
-Flights = ['B895_dataPC']
+Flights = ['B894_dataPC']
  
 #missed 231
 
