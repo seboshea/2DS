@@ -534,7 +534,8 @@ def Colocated_sVol_arrayV2(DiameterX,Diameter,Lambda_um,ArmSep,ArrayElements,Pix
     
 def GetIAT_TimeInS_2DS(Seconds):
     IAT=np.zeros(len(Seconds))
-    for i in range (len(IAT)-1):
+    #for i in range (len(IAT)-1):
+    for i, S in enumerate(Seconds) :
         IAT[i]=IAT_TimeInS_2DS(Seconds,i)
     return IAT
 
