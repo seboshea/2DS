@@ -91,7 +91,7 @@ def BatchFindStereo(Info2DS, FlightNumberStr):
 # Applies 'IAT_threshold' to remove shattered particles
 # To remove probe streaking allows a max aspect ratio (y dimension / x dimension) and 
 # removes  particles >=5 in y dimension and 1 is x dimension.
-#Flags edge particles 
+# Flags edge particles 
 
 def FindStereo(filena, Info2DS,FlightNumberStr ):
     SaveFile =1
