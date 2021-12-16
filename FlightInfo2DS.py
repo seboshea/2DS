@@ -7,12 +7,23 @@
 # data paths and probe settings 
 
 
-#meanXYFlag = 1 # 1= mean xy, 0= max
 #MaxAspectRatio = 10 # Airspeed diameter / array diameter
 #Streak = 5 # Exclude particles 5 long and 1 wide
-#BiggestParticle  # 0 = BBox, 1 = largest particle
-#ThresholdSize = Size to switch between stereo and standard psd
-#ThresholdDeltaDiameterY = um allowed difference in y diameter for stereo, -1 no threshold
+
+#'Path2DS' - the directory (str) with .h5 2DS images and pbp statistics from oasis
+#'Path2DSsave' - the directory (str) to save the processed data an diagnostics
+#'FlightDate' -np.datetime64('YYYY-MM-DD HH:MM:SS') flight date
+#'ColocationThreshold' - 1E-6, time separation to classify stereo particles
+#'IAT_threshold' - 1E-5 time separation shattered particles
+#'TAS' -m/s airspeed
+#'ThresholdDeltaDiameterY' - um allowed difference in y diameter for stereo, -1 no threshold
+#'ThresholdSize' - um Size to switch between stereo and standard psd
+#'MeanXYFlag'] - 1= mean xy, 0= max
+#'BiggestParticle'-  0 = BBox, 1 = largest particle
+#'FlightNumber' - flight number as str 
+# 'ArmSep' - probe arm separation in cm
+# 'CorePath' - the directory (str) with core data file
+# 'CoreFileName - name of the core data file (str)
 
 
 import numpy as np
