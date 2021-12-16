@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
 
 #Procedures to identify stereo 2DS particles and calculate PSDs
+# See https://amt.copernicus.org/articles/14/1917/2021/amt-14-1917-2021.html
 
 #Steps:
 #1) Rawfile processing using OASIS and Image Output as .h5 file. 
 #2) Add data paths and probes settings to GetFlightInfo2DS().
-#3) Info2DS = GetFlightInfo2DS()
-#4) BatchFindStereo(Info2DS,FlightNumberStr), find stereo particles and create PSDs using stereo and traditional.
-#5) HybridStereoProcessing(Info2DS,FlightNumberStr), combine traditional and stereo psds for all files in folder.
+#3) Info2DS = GetFlightInfo2DS() # Load a paths and settings
+#4) BatchFindStereo(Info2DS,FlightNumberStr) # find stereo particles and create PSDs using stereo and traditional.
+#5) dNdD_L_Output, Counts_Output, Flag_output, TimeMid, PSD_SizeMid = HybridStereoProcessing(Info2DS,FlightNumberStr) # combine traditional and stereo psds for all files in folder.
+
 
 #v1.0 - 25/08/20
 # original. Duplicates the procedures from 'Colocation2DSV2.py'
@@ -79,14 +81,22 @@ def BatchFindStereo(Info2DS, FlightNumberStr):
 
 #_________________________________________________________________________________
         
-# Select particles with time seperation below ColocationThreshold on the other channel
+# Select particles where time separation with nearest neighbour on the other 
+# channel is less than ColocationThreshold.
 
 # Particles ColocationDelta < ColocationThreshold are classed as stereo particles
-# Additionally the difference in y diameter must be less than ThresholdDeltaDiameterY um
+# Can include additional constraint that the difference in y diameter 
+# must be less than ThresholdDeltaDiameterY um.
+
+# Applies 'IAT_threshold' to remove shattered particles
+# To remove edge particles sets max aspect ratio (y dimension / x dimension) and 
+# removes  particles >=5 in y dimension and 1 is x dimension.
+
 
 def FindStereo(filena, Info2DS,FlightNumberStr ):
     SaveFile =1
     
+    # Load settings from 'FlightInfo2DS.py'
     Path2DS = Info2DS[FlightNumberStr, 'Path2DS']
     PathSave = Info2DS[FlightNumberStr, 'Path2DSsave']
     PixelSize = Info2DS['PixelSize']
@@ -117,7 +127,8 @@ def FindStereo(filena, Info2DS,FlightNumberStr ):
     Channel = ParticleTimesWv[:,4] 
     
     if len(Channel[Channel == 0 ]) < 20 : return # if less than 100 particles in file don't calculate flag
-         
+    
+    # Choose either bounding box or largest particle for sizing 
     if BiggestParticle == 0 : # bounding box
         DiameterX=PixelSize+PixelSize*(ParticleStatsWv[:,4]-ParticleStatsWv[:,3]) #x diameter
         DiameterY = PixelSize+PixelSize*(ParticleStatsWv[:,6]-ParticleStatsWv[:,5])
@@ -297,6 +308,7 @@ def FindStereo(filena, Info2DS,FlightNumberStr ):
     #IAT_Ch0_colocation = IAT_Ch0[ColocationIDX]
     #IAT_Ch1_colocation = IAT_Ch1[ChTimeDelta < ColocationThreshold]
 
+    #Compare y diameter with nearest neighbour on opposite channel
     DeltaDiameterY_hist(ColocationDiameterY_Ch0, ColocationDiameterY_Ch1, ColocationDelta, ColocationThreshold, PathSave,filena)
   
     # Plot CH1 vs CH0 diameter for stereo particles
@@ -474,35 +486,7 @@ def PSD_Colocate_1hzV2(Info2DS,FlightNumberStr,SavePrefix,SecondsCh0, DiameterXC
         file.create_dataset('SizeBinsMid', data=SizeBinsMid)
                 
         file.close()
-
-
-    # if 1==2 : 
-    #     test = np.datetime64('1900-01-01 00:00:00')
-    #     dt= [test + np.timedelta64(np.int32(x),'s') for x in TimeBinsMid]
-   
-        
-        
-    #     #dt = datetime.timedelta(seconds = TimeBinsMid)
-    #     fig=plt.figure(figsize=(12,8)) 
-    #     date_format = mdates.DateFormatter('%H:%M:%S')
-    #     plt.plot(dt,TotalCounts_Ch0, label = 'Ch0')
-    #     plt.plot(dt,TotalCounts_Ch1, label = 'Ch1')
-    #     plt.gca().xaxis.set_major_formatter(date_format)
-    #     plt.yscale('log')
-    #     plt.xlabel('Time')
-    #     plt.ylabel('Total counts')
-    #     plt.legend()
-        
-    #     if ColocatedFlag == 1 :
-    #         plt.title('Colocated particles')
-    #         plt.savefig(Path2DSsave+'CountsColocate'+filena[:-3]+'.png',dpi=200)
-            
-    #     else : 
-    #         plt.title('All particles')
-    #         plt.savefig(Path2DSsave+'Counts'+filena[:-3]+'.png',dpi=200)
-            
-    #     plt.close(fig)
-        
+       
 
 ##________________________________________________________________________________-
 
@@ -806,6 +790,10 @@ def Flag2DS(Path2DS,PathSave,ImageFileName,ParticleFileName,FlightDate):
     plt.close(fig)
     
 #_______________________________________________________________________________________  
+
+# Create single psd file from all psd files in directory. Use stereo analysis for small 
+# particles  (<'ThresholdSize']) and standard for large particles 
+
 
 def HybridStereoProcessing(Info2DS,FlightNumberStr, FillValue):
     
@@ -1202,7 +1190,7 @@ def DeltaDiameterY_hist(ColocationDiameterY_Ch0, ColocationDiameterY_Ch1, Coloca
 
 #____________________________________________________________________________________
 
-# Great stereo psds applying different particle filters
+# Create stereo psds applying different particle filters
 
 def Stereo_Dy_filter(Path2DS,filena,StartTime, EndTime,suffix):
             
